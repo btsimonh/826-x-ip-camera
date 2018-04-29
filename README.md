@@ -6,13 +6,19 @@ https://www.amazon.co.uk/gp/product/B074M71BRF/ref=oh_aui_detailpage_o01_s00?ie=
 
 Mine was branded 'OnvianTech 1080P Wi-Fi IP Security Camera', but also known as 'Pannovo 826-x', 'FUJIKAM CCTV Security 1080P 2.0MP WiFi IPCamera'.
 
+It's Grain 8136s based with ethernet, wifi, USB OTG and SD card, with pan and tilt, dubbed a 'Cloud Camera'.
+
 The camera works with https://www.mipcm.com, however there is no information about the security of the camera, or what they may do with your data.
 
 So; before attaching it to my wireless network, I'm going to have  to break into it to see what it's made of.
 
 It does have a local webpage which works with PC but not with mobile browsers.  The mipc PC app is a wrapped html app.
 
-The local webpage is mainly a javascript application, and as such is relatively esy to debug into in order to examine the protocols involved.
+The local webpage is mainly a javascript application, and as such is relatively easy to debug into in order to examine the protocols involved.
 
 More worrying is that the camera does talk to mipc servers, at least for firmware updates, but it sends a fair bit of encrypted data to the servers, so without convincing documentation or evidence, this data is not to be trusted.
+
+I have obtained an incremental firmware update file (ipc_pack_patch_from_v4.6.2.1706161621.rtl8188fu_to_v5.1.5.1803281502.rtl8188fu.bin), which consists of several parts: an lzma compressed patch to patch a tar file, an executable, a script, and a CRC, plus a few numbers...  A full firmware file is elusive
+
+Ideally, we'd find a way to gain ssh or telnet to the device linux without openning the camera (e.g. here https://github.com/Filipowicz251/mijia-1080P-hacks/issues/1 there is some discussion of hacking a similar Grain 8136 based camera).  The upgrade file gives some hints, but I think I'll need to connect to uboot and extract the full firmware to find something. 
 
