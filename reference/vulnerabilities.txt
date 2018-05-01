@@ -1,0 +1,13 @@
+Apparent vulnerabilities:
+
+seem that GET from the url
+
+http://<cameraip>/ccm/ccm_notify/-dvalue-10.xml
+
+with different values does a variety of stuff without login.
+
+the same function is accessible via
+
+http://<cameraip>/ccm/ccm_notify.js?dvalue=10
+
+

@@ -1,0 +1,35 @@
+The basic protocol (for local access) involves using GET requests against endpoints.
+
+(from chrome debug on local webpage)
+
+The general form is 
+
+http://<cameraip>/ccm/<function>.js?
+
+followed by query variables
+
+e.g. for login:
+
+hfrom_handle=66947&
+dlid=0x4&
+dnid=MCLEfBqU2QDeAVuf5aBR6WdBAWEEgQI&
+duser=<username>&
+dpass=<md5 of password>&
+dsession_req=1&
+dparam__x_countz_=1&
+dparam=1&
+dparam_name=spv&
+dparam_value=1
+
+and return a javascript snippet.
+
+I assume the same functions are also available as XML (see 'vulnerabilities.txt')
+
+examples:
+
+http://192.168.1.57/ccm/ccm_info_get.js?hfrom_handle=505038&
+
+message({type:"ccm_info_get_ack",from:542113792,from_handle:46,to_handle:505038,data:{ret:{code:"",sub:"",reason:"",desc:""},type:"IPC",sn:"<removed>",nick:"mycam",ver:"v5.1.5.1803281502",spv:"v1"}});
+
+before 'real' things can be done with the camera, there is some form of key exchange, generating 'lid' and 'nid'.
+
