@@ -22,3 +22,39 @@ I have obtained an incremental firmware update file (ipc_pack_patch_from_v4.6.2.
 
 Ideally, we'd find a way to gain ssh or telnet to the device linux without openning the camera (e.g. here https://github.com/Filipowicz251/mijia-1080P-hacks/issues/1 there is some discussion of hacking a similar Grain 8136 based camera).  The upgrade file gives some hints, but I think I'll need to connect to uboot and extract the full firmware to find something. 
 
+.........
+
+a little later:
+
+
+```<removed>@<removed>@m@u@e.<removed> login: root
+Password:
+login: can't chdir to home directory '/root'
+
+|---------------------------------------------------------------------------|
+| Welcome to                                                                |
+|                                                                           |
+|                    A                                                      |
+|                   AAA                                                     |
+|                  AAAAA                                                    |
+|                 AAAAAAA                                                   |
+|                AAAA   AA                                                  |
+|         A     AAAA     AA                                                 |
+|        AAA   AAAA       AA          AAA   AAAAA    AAA   AAAAA    AAAAA   |
+|       AAAAA AAAA         AA              AA   AA        AA   AA  AA   AA  |
+|      AAAAAAAAAA           AA        AAA  AA   AA   AAA  AA   AA  AA   AA  |
+|     AAAAA AAAA             AA       AAA  AA   AA   AAA  AA   AA  AA   AA  |
+|    AAAAA    A               AA      AAA  AA   AA   AAA  AA   AA   AAAAAA  |
+|   AAAAA                      AA     AAA  AA   AA   AAA  AA   AA       AA  |
+| AAAAAA                        AAAA  AAA  AA   AA   AAA  AA   AA  AAAAAA   |
+|===========================================================================|
+|                                                                           |
+|                                             http://www.shenzhenmining.com |
+|                                           power by (C)shenzhenmining 2015 |
+|---------------------------------------------------------------------------|
+
+
+
+
+BusyBox v1.20.1 (2015-03-29 21:56:34 HKT) built-in shell (ash)
+Enter 'help' for a list of built-in commands.```
