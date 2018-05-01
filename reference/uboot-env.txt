@@ -1,0 +1,76 @@
+GM # help
+?       - alias for 'help'
+boot    - boot default, i.e., run 'bootcmd'
+bootd   - boot default, i.e., run 'bootcmd'
+bootlogo- show lcd bootlogo
+bootm   - boot application image from memory
+bootp   - boot image via network using BOOTP/TFTP protocol
+chpart  - change active partition
+cmp     - memory compare
+cp      - memory copy
+crc32   - checksum calculation
+dcache  - enable or disable data cache
+env     - environment handling commands
+erase   - erase FLASH memory
+fatinfo - print information about filesystem
+fatload - load binary file from a dos filesystem
+fatls   - list files in a directory (default /)
+flinfo  - print FLASH memory information
+fwupd   - firmware upgrade from usb device for specified filename
+go      - start application at address 'addr'
+help    - print command description/usage
+i2c     - I2C sub-system
+icache  - enable or disable instruction cache
+l2cache_test- Perform test of L2 cache
+md      - memory display
+memtester- memory tester
+mii     - MII utility commands
+mm      - memory modify (auto-incrementing address)
+mmc     - MMC sub system
+mmcinfo - display MMC info
+mtdparts- define flash/nand partitions
+mtest   - simple RAM read/write test
+mw      - memory write (fill)
+nm      - memory modify (constant address)
+ping    - send ICMP ECHO_REQUEST to network host
+printenv- print environment variables
+protect - enable or disable FLASH write protection
+reset   - Perform RESET of the CPU
+run     - run commands in an environment variable
+saveenv - save environment variables to persistent storage
+setenv  - set environment variables
+sf      - SPI flash sub-system
+sspi    - SPI utility command
+tftpboot- boot image via network using TFTP protocol
+usb     - USB sub-system
+usbboot - boot from USB device
+version - print monitor, compiler and linker version
+GM # printenv
+auimg0=u-boot_spi.bin
+auimg1=uImage_8136
+auimg2=rootfs-cpio_8136.squashfs.img
+auimg3=mtd.img
+auimgaio=flash.img
+auimgbot=nsboot.bin
+autoupdate=no
+baudrate=115200
+bootcmd=sf probe 0:0;run lm;bootm 0x2000000
+bootdelay=3
+cmd1=mem=64M gmmem=30M console=ttyS0,115200 user_debug=31 init=/squashfs_init root=/dev/mtdblock2 rootfstype=squashfs
+cmd2=mem=128M gmmem=90M console=ttyS0,115200 user_debug=31 init=/squashfs_init root=/dev/mtdblock2 rootfstype=squashfs
+cmd3=mem=256M gmmem=190M console=ttyS0,115200 user_debug=31 init=/squashfs_init root=/dev/mtdblock2 rootfstype=squashfs
+cmd4=mem=512M gmmem=432M console=ttyS0,115200 user_debug=31 init=/squashfs_init root=/dev/mtdblock2 rootfstype=squashfs
+ethact=eth0
+ethaddr=00:42:70:00:30:22
+gatewayip=10.0.1.51
+ipaddr=10.0.1.52
+lm=sf read 0x02000000 z
+netmask=255.0.0.0
+serverip=10.0.1.51
+stderr=serial
+stdin=serial
+stdout=serial
+
+Environment size: 921/65532 bytes
+GM #
+

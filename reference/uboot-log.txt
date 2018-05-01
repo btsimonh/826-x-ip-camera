@@ -1,0 +1,635 @@
+mode 3
+Version 1.0.2A
+SPI NOR ID code:0xc2 0x20 0x18
+SPI jump setting is 3 bytes mode
+Boot image offset: 0x10000. size: 0x50000. Booting Image .....
+
+
+U-Boot 2013.01 (May 16 2017 - 18:23:08)
+
+I2C:   ready
+DRAM:  64 MiB
+ROM CODE has enable I cache
+SPI mode
+MMC:   FTSDC021: 0
+SF: Got idcodes
+00000000: c2 20 18 c2    . ..
+SF: Detected MX25L12805D with page size 64 KiB, total 16 MiB
+flash is 3byte mode
+*** Warning - bad CRC, using default environment
+
+In:    serial
+Out:   serial
+Err:   serial
+
+-------------------------------
+ID: 8136150
+AC: 200  HC: 200  P1: 860  P2: 600  P3: 540
+C6: 860  DR:1146
+J: 286   H1: 286
+-------------------------------
+Net:   GMAC set RMII mode
+reset PHY
+eth0
+Warning: eth0 MAC addresses don't match:
+Address in SROM is         <mac removed>
+Address in environment is  <mac removed>
+
+SF: Got idcodes
+00000000: c2 20 18 c2    . ..
+SF: Detected MX25L12805D with page size 64 KiB, total 16 MiB
+flash is 3byte mode
+0 [0x10000 0x50000]
+1 [0x60000 0x3a0000]
+2 [0x400000 0x600000]
+3 [0xa00000 0x5f0000]
+4 [0xff0000 0x10000]
+Card did not respond to voltage select!
+** Bad device mmc 0 **
+sd card not exist
+Hit any key to stop autoboot:  0
+SF: Got idcodes
+00000000: c2 20 18 c2    . ..
+SF: Detected MX25L12805D with page size 64 KiB, total 16 MiB
+flash is 3byte mode
+## Booting kernel from Legacy Image at 02000000 ...
+   Image Name:   gm8136
+   Image Type:   ARM Linux Kernel Image (uncompressed)
+   Data Size:    2366984 Bytes = 2.3 MiB
+   Load Address: 02000000
+   Entry Point:  02000040
+   Verifying Checksum ... OK
+   XIP Kernel Image ... OK
+OK
+: mem=128M gmmem=90M console=ttyS0,115200 user_debug=31 init=/squashfs_init root                                                                                                                          =/dev/mtdblock2 rootfstype=squashfs
+
+Starting kernel ...
+
+Uncompressing Linux... done, booting the kernel.
+Booting Linux on physical CPU 0
+Linux version 3.3.0 (branch_8136_cloud@debian) (gcc version 4.4.0 20100318 (expe                                                                                                                          rimental) (Buildroot 2012.02) ) #1 PREEMPT Tue May 16 02:44:10 CST 2017
+CPU: FA6 [66056263] revision 3 (ARMv5TE), cr=0000397f
+CPU VIPT aliasing data cache, unknown instruction cache
+Machine: Grain-Media GM8136 series
+Memory policy: ECC disabled, Data cache writeback
+Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 32512
+Kernel command line: mem=128M gmmem=90M console=ttyS0,115200 user_debug=31 init=                                                                                                                          /squashfs_init root=/dev/mtdblock2 rootfstype=squashfs
+PID hash table entries: 512 (order: -1, 2048 bytes)
+Dentry cache hash table entries: 16384 (order: 4, 65536 bytes)
+Inode-cache hash table entries: 8192 (order: 3, 32768 bytes)
+Memory: 128MB = 128MB total
+Memory: 125340k/125340k available, 5732k reserved, 0K highmem
+Virtual kernel memory layout:
+    vector  : 0xffff0000 - 0xffff1000   (   4 kB)
+    fixmap  : 0xfff00000 - 0xfffe0000   ( 896 kB)
+    vmalloc : 0xc8800000 - 0xff000000   ( 872 MB)
+    lowmem  : 0xc0000000 - 0xc8000000   ( 128 MB)
+    modules : 0xbf000000 - 0xc0000000   (  16 MB)
+      .text : 0xc0008000 - 0xc04280a8   (4225 kB)
+      .init : 0xc0429000 - 0xc0446000   ( 116 kB)
+      .data : 0xc0446000 - 0xc04632e0   ( 117 kB)
+       .bss : 0xc0463304 - 0xc0474248   (  68 kB)
+NR_IRQS:64
+gm_jiffies_init, system HZ: 100, pClk: 100000000
+console [ttyS0] enabled
+Calibrating delay loop... 858.52 BogoMIPS (lpj=4292608)
+pid_max: default: 32768 minimum: 301
+Mount-cache hash table entries: 512
+CPU: Testing write buffer coherency: ok
+Setting up static identity map for 0x3118e8 - 0x311930
+devtmpfs: initialized
+FMEM: 23040 pages(0x5a00000 bytes) from bank0 are reserved for Frammap.
+FMEM: Logical memory ends up at 0xc8000000, init_mm:0xc0004000(0x4000), PAGE_OFF                                                                                                                          SET:0xc0000000(0x0),
+FMEM: FA726 Test and Debug Register: 0x0
+NET: Registered protocol family 16
+PMU: Mapped at 0xfe000000
+IC: GM8136, version: 0x1
+iotable: VA: 0xfe000000, PA: 0x90c00000, Length: 4096
+iotable: VA: 0xfe001000, PA: 0x90700000, Length: 4096
+iotable: VA: 0xfe002000, PA: 0x90800000, Length: 4096
+iotable: VA: 0xfe003000, PA: 0x90900000, Length: 4096
+iotable: VA: 0xfe004000, PA: 0x90d00000, Length: 4096
+iotable: VA: 0xfe005000, PA: 0x96000000, Length: 4096
+bio: create slab <bio-0> at 0
+usbcore: registered new interface driver usbfs
+usbcore: registered new interface driver hub
+usbcore: registered new device driver usb
+Switching to clocksource fttmr010:1
+cfg80211: Calling CRDA to update world regulatory domain
+NET: Registered protocol family 2
+IP route cache hash table entries: 1024 (order: 0, 4096 bytes)
+TCP established hash table entries: 4096 (order: 3, 32768 bytes)
+TCP bind hash table entries: 4096 (order: 2, 16384 bytes)
+TCP: Hash tables configured (established 4096 bind 4096)
+TCP reno registered
+UDP hash table entries: 256 (order: 0, 4096 bytes)
+UDP-Lite hash table entries: 256 (order: 0, 4096 bytes)
+NET: Registered protocol family 1
+RPC: Registered named UNIX socket transport module.
+RPC: Registered udp transport module.
+RPC: Registered tcp transport module.
+RPC: Registered tcp NFSv4.1 backchannel transport module.
+Video Timer(timer3) Max 42000ms in 0xfa56ea00 HZ.
+ftdmac020 ftdmac020.0: DMA engine driver: irq 1, mapped at 0xc8804000
+GM CPU frequency driver
+CPUFREQ support for gm initialized
+squashfs: version 4.0 (2009/01/31) Phillip Lougher
+JFFS2 version 2.2. (NAND) © 2001-2006 Red Hat, Inc.
+msgmni has been set to 244
+io scheduler noop registered
+io scheduler deadline registered (default)
+gpiochip_add: registered GPIOs 0 to 31 on device: ftgpio010.0
+probe ftgpio010.0 OK, at 0xc8856000
+gpiochip_add: registered GPIOs 32 to 63 on device: ftgpio010.1
+probe ftgpio010.1 OK, at 0xc8858000
+Serial: 8250/16550 driver, 3 ports, IRQ sharing disabled
+serial8250: ttyS0 at I/O 0xfe001000 (irq = 21) is a 16550A
+serial8250: ttyS1 at I/O 0xfe002000 (irq = 22) is a 16550A
+serial8250: ttyS2 at I/O 0xfe003000 (irq = 25) is a 16550A
+brd: module loaded
+loop: module loaded
+Not for SPI-NAND pin mux
+SPI020 init
+SPI020 uses AHB DMA mode
+FTSPI020 enable DMA handshake 0x3
+SPI020 gets DMA channel 0
+ftspi020 ftspi020.0: Faraday FTSPI020 Controller at 0x92300000(0xc885a000) irq 5                                                                                                                          4.
+spi spi0.0: setup: bpw 8 mode 0
+CLK div field set 1, clock = 30000000Hz
+ERASE SECTOR 64K
+SPI_FLASH spi0.0: MX25L12845E (16384 Kbytes)
+Creating 6 MTD partitions on "nor-flash":
+0x000000010000-0x000000060000 : "UBOOT"
+0x000000060000-0x000000400000 : "LINUX"
+0x000000400000-0x000000a00000 : "FS"
+0x000000a00000-0x000000ff0000 : "USER0"
+0x000000ff0000-0x000001000000 : "USER1"
+0x000000000000-0x000001000000 : "ALL"
+Probe FTSPI020 SPI Controller at 0x92300000 (irq 54)
+ftgmac: Loading version 2.0 ...
+ftgmac: Tx queue number = 128, Rx queue number = 128
+ftgmac100-0-mdio: probed
+ftgmac100-0 ftgmac100-0.0: eth0: 1 tx queue used (max: 2)
+ftgmac100-0 ftgmac100-0.0: eth0: 1 rx queue used (max: 1)
+ftgmac100-0 ftgmac100-0.0: eth0: irq 3, mapped at c885c000
+ftgmac100-0 ftgmac100-0.0: eth0: generated random MAC address 8a:91:b6:be:26:18
+ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+FOTG2XX Controller Initialization
+Enter Device A
+Drive Vbus because of ID pin shows Device A
+fotg210 fotg210.0: FOTG2XX
+fotg210 fotg210.0: new USB bus registered, assigned bus number 1
+fotg210 fotg210.0: irq 9, io mem 0x93000000
+fotg210 fotg210.0: USB 2.0 started, EHCI 1.00
+hub 1-0:1.0: USB hub found
+hub 1-0:1.0: 1 port detected
+usbcore: registered new interface driver cdc_wdm
+usbcore: registered new interface driver usbtmc
+i2c /dev entries driver
+i2c i2c-0: Not I2C compliant: can't read SCL
+i2c i2c-0: Bus may be unreliable
+i2c-mining-gpio i2c-mining-gpio.0: using pins 19 (SDA) and 18 (SCL, no clock str                                                                                                                          etching)
+sdhci: Secure Digital Host Controller Interface driver
+sdhci: Copyright(c) Pierre Ossman
+VUB300 Driver rom wait states = 1C irqpoll timeout = 0400
+usbcore: registered new interface driver vub300
+usbcore: registered new interface driver ushc
+mmc0: SDHCI controller on ftsdc021.0 [ftsdc021.0] using ADMA
+sdhci-pltfm: SDHCI platform and OF driver helper
+TCP cubic registered
+NET: Registered protocol family 10
+IPv6 over IPv4 tunneling driver
+NET: Registered protocol family 17
+lib80211: common routines for IEEE802.11 drivers
+VFS: Mounted root (squashfs filesystem) readonly on device 31:2.
+devtmpfs: mounted
+Freeing init memory: 116K
+usb 1-1: new high-speed USB device number 2 using fotg210
+busybox: /linuxrc: Read-only file system
+Mounting root fs rw ...
+Mounting other filesystems ...
+usbfs: unrecognised mount option "defaults" or missing value
+usbfs: mount parameter error.
+Setting hostname ...
+Bringing up interfaces ...
+/bin/sh: run-parts: not found
+Mounting user's MTD partion
+[1970-01-01 00:00:03 rc.devinit] run /etc/init.d/dev_init.sh
+Frammap: 4608 pages in DDR0 are freed.
+Frammap: DDR0: memory base=0x1800000, memory size=0x4800000, align_size = 256K.
+Frammap: version 1.1.2, and the system has 1 DDR.
+Frammap: fail to open /mnt/mtd/config_8136, /tmp/template_8136 is created.
+insmod: page allocation failure: order:2, mode:0x20
+[<c000ef84>] (unwind_backtrace+0x0/0xf4) from [<c006b9c0>] (warn_alloc_failed+0x                                                                                                                          9c/0x11c)
+[<c006b9c0>] (warn_alloc_failed+0x9c/0x11c) from [<c006c374>] (__alloc_pages_nod                                                                                                                          emask+0x3bc/0x614)
+[<c006c374>] (__alloc_pages_nodemask+0x3bc/0x614) from [<c008d168>] (T.547+0xac/                                                                                                                          0x3c8)
+[<c008d168>] (T.547+0xac/0x3c8) from [<c008d6d0>] (cache_alloc_refill+0x24c/0x29                                                                                                                          8)
+[<c008d6d0>] (cache_alloc_refill+0x24c/0x298) from [<c008d7f4>] (__kmalloc+0xd8/                                                                                                                          0xec)
+[<c008d7f4>] (__kmalloc+0xd8/0xec) from [<bf008834>] (mnvram_create+0x194/0x588                                                                                                                           [mnvram])
+[<bf008834>] (mnvram_create+0x194/0x588 [mnvram]) from [<bf00b014>] (init_module                                                                                                                          +0x14/0x34 [mnvram])
+[<bf00b014>] (init_module+0x14/0x34 [mnvram]) from [<c00083d4>] (do_one_initcall                                                                                                                          +0x30/0x178)
+[<c00083d4>] (do_one_initcall+0x30/0x178) from [<c005422c>] (sys_init_module+0x8                                                                                                                          4/0x198)
+[<c005422c>] (sys_init_module+0x84/0x198) from [<c0009960>] (ret_fast_syscall+0x                                                                                                                          0/0x2c)
+Mem-info:
+Normal per-cpu:
+CPU    0: hi:   42, btch:   7 usd:  40
+active_anon:129 inactive_anon:86 isolated_anon:0
+ active_file:147 inactive_file:357 isolated_file:0
+ unevictable:0 dirty:0 writeback:0 unstable:0
+ free:136 slab_reclaimable:193 slab_unreclaimable:10545
+ mapped:105 shmem:96 pagetables:21 bounce:0
+Normal free:544kB min:1440kB low:1800kB high:2160kB active_anon:516kB inactive_a                                                                                                                          non:344kB active_file:588kB inactive_file:1428kB unevictable:0kB isolated(anon):                                                                                                                          0kB isolated(file):0kB present:130048kB mlocked:0kB dirty:0kB writeback:0kB mapp                                                                                                                          ed:420kB shmem:384kB slab_reclaimable:772kB slab_unreclaimable:42180kB kernel_st                                                                                                                          ack:304kB pagetables:84kB unstable:0kB bounce:0kB writeback_tmp:0kB pages_scanne                                                                                                                          d:0 all_unreclaimable? no
+lowmem_reserve[]: 0 0
+Normal: 6*4kB 7*8kB 1*16kB 2*32kB 0*64kB 1*128kB 1*256kB 0*512kB 0*1024kB 0*2048                                                                                                                          kB 0*4096kB 0*8192kB = 544kB
+600 total pagecache pages
+32768 pages of RAM
+238 free pages
+19836 reserved pages
+10738 slab pages
+678 pages shared
+0 pages swap cached
+mnvram_create fail when kmalloc!!. /root/project/src/kernel/gm8136/arm-linux-3.3                                                                                                                          /module/mnvram/mnvram.c:229
+mnvram_create alloc finish. cast=1, buf_size:16384, buf_counts:2511. data_counts                                                                                                                          :0, crc_counts:0. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mn                                                                                                                          vram.c:285
+mnvram_create free finish. /root/project/src/kernel/gm8136/arm-linux-3.3/module/                                                                                                                          mnvram/mnvram.c:322
+mnvram_create remove finish, cast=1. g_cb.buf_counts:4. /root/project/src/kernel                                                                                                                          /gm8136/arm-linux-3.3/module/mnvram/mnvram.c:350
+mnvram_init OK!!
+mpatch_patch ok( /tmp/project.tar, /tmp/project.tar, /mnt/mtd/dev_data/ipc_pack_diff ). mpatch_patch.c:467
+/
+dev_init.sh patch apply success
+dev_init.sh run /project/apps/app/ipc/data/sh/dev_start.sh
+log: module license 'GM' taints kernel.
+Disabling lock debugging due to kernel taint
+log.ko: Jan 13 2015 18:00:07 (mmap 0xc7180000 size 0xc000)
+
+LOG base 0xc8898000 size 256K (start pointer 0xbf010114)
+PAGE_OFFSET(0x80000000) VMALLOC START(0xc8800000) HZ(100)
+ms.ko v1.0_clear_non16align Sep 16 2015 17:33:57
+em.ko v0.27_transcode Sep 14 2015 15:40:53
+em_user v0.6 Sep 14 2015 15:40:53
+Start EM thread 0(em_callback:0) with nice -20
+
+EM Module Service Starting (callback_period = 3ms)
+Start EM thread 2(em_callback:2) with nice -20
+Start EM thread 1(em_callback:1) with nice -20
+
+Welcome to use sar_adc_drv VER:2.0
+ * module_init_func
+ * register_driver
+ * driver_probe
+ * dev_data_alloc_specific done
+ * ADDA paddr=90b00000 vaddr=c893e000 tve paddr=93500000 vaddr=c8940000
+ * set_pinmux set as 0xB8 0xFFECF278 OK
+ * register_cdev
+driver_probe done, io_vadr 0xC893C000, io_padr 0x90A00000 0xC71EB6C0
+driver_probe done,runmod:0x0,0x0,0x0,0x0
+think2d_module_init
+** T2D VER:2.4 ** think2d_drv_probe done, vbase 0xC894A000, pbase 0x92200000 0xC707DA80 (1)
+ftpwmtmr010(0x91b00000) mapping address = 0xc8960000
+Register PWM character driver success!
+fe_common version 140714
+platform_init
+ADDA308 current use MCLK=24571428
+adda308_init_one [0] version 150324
+FT3DNR200 Version 2015_0107_1008
+request IRQ42 with ft3dnr_interrupt() ok!
+FT3DNR sp.0 buf size 0x4600 width 1920 height 1088 phy addr 0x1880000
+FT3DNR mot.0 buf size 0x210 width 1920 height 1088 phy addr 0x18c0000
+FT3DNR mot.1 buf size 0x210 width 640 height 368 phy addr 0x1900000
+FT3DNR var.0 buf size 0x280 width 1920 height 1088 phy addr 0x1940000
+FT3DNR var.1 buf size 0x60 width 640 height 368 phy addr 0x1980000
+FT3DNR ref.0 buf size 0x3fc000 width 1920 height 1088 phy addr 0x19c0000
+FT3DNR ref.1 buf size 0x73000 width 640 height 368 phy addr 0x1dc0000
+ISP328 v1.66, built @ Nov 11 2016 17:21:38
+USE_DMA_CMD: TRUE
+ISP Alogrithm v2.10
+Register [0][GM_AE]
+Register [1][GM_AWB]
+Register [2][GM_AF]
+EXT_CLK output ==> 27000000Hz
+CAP driving capacity = 48
+[ISP_INFO]: Sensor Name : ps5230
+[ISP_INFO]: Sensor Interface : PARALLEL
+pixel clock 74250000
+[VCAP_INFO]: VCAP300 Version: 0.3.7
+[ISP_INFO]: Found [GM_AE]
+[ISP_INFO]: Found [GM_AWB]
+[ISP_INFO]: Found [GM_AF]
+[ISP_WARN]: [AWB_M2] $grey_cx_boundary$ is not found!!
+[VCAP_INFO]: Register ISP Input Device
+MCP100 GM8136, built @ Mar 17 2015 14:12:29
+FAVC Encoder v0.1.123, built @ Apr  2 2015 18:24:42 (GM8136)
+H264 rate control(VG) version: 1.1.11, built @ Jan  9 2015 13:55:18
+Decoder v1.0.3, built @ Mar 17 2015 14:12:14
+GM8136 MJPEG, encoder v4.0.22, decoder v4.0.9, built @ Mar 17 2015 14:12:34
+osg canvas is dynammic allocate mode
+SWOSG ver 0.0.1
+SCALER version 141119, temp_width: 0, temp_height: 0
+fscaler300_init_one [0] NCNB
+audio_init: audio driver is inserted, minor version: 0224_1619
+Record(SSP:0): stream->dma_buffer = ce4000(ffdec000), size:800, dma_ch: 1
+Playback(SSP:0): stream->dma_buffer = cec000(ffde8000), size:800, dma_ch: 2
+gs.ko v1.5_fixed_timestamp_order Sep 15 2015 17:11:33
+GS driver, log: level(0) category(0) bmp width(64)
+loop_comm.ko v0.5 Jan 13 2015 18:00:08
+vpd_slave.ko v1.6_fixup_layout_rmmod Sep 14 2015 15:29:38
+config_path="/mnt/mtd"
+loopcomm slave init: Bus(101) getcp_bus(103) query_bs_bus(105) pack_membus(107)
+Parsing CAP vg_info version: 0.3.7
+vplib v2.0 Sep 14 2015 15:29:40
+config_init v0.18 Sep 14 2015 15:29:48 /mnt/mtd/gmlib.cfg
+-----------------------------------------------------------------------------------
+; GM8136_1M(Tiny Memory) Product Configuration (Without LCD, MPEG4, Scaler Substream, Encode Switching)
+[VERSION]
+VERSION = 0.1
+
+[GRAPH_TYPE]
+; graph type: 1(DVR with display 3DI), 2(IPCAM)
+graph_type = 2
+
+[DISPLAY_GROUP]
+; GROUP0 = lcd_vch0, lcd_vch1
+; Display group method:
+;   0(FRAME), 2(2FRAME), 3(2FRAME_2FRAME), 4(FRAME_FRAME)
+GROUP0 = 0
+METHOD0 = 0
+
+[BITRATE]
+min_compressed_ratio = 30
+max_bitrate = 8M/10240K, 3M/8192K, 2M/4096K, D1/1024K, CIF/512K
+
+[PLAYBACK]
+; CONFIG1 = resolution_keywords/channels/total_fps/ddr_channel, ...
+; default resolution keywords: 8M, 5M, 4M, 3M, 2M, 1.3M, 1M, nHD, 1080P, 720P, D1, VGA, CIF, QCIF
+
+[PLAYBACK_3DI]
+; CONFIG1 = resolution_keywords/channels/total_fps/ddr_channel, ...
+
+[ENCODE_STREAMS]
+; CONFIG1 = resolution_keywords/channels/total_fps/ddr_channel, ...
+CONFIG1 = 1080P/1/15/0, nHD/1/15/0, CIF/1/15/0
+
+[ENCODE_CAPTURE]
+; CONFIG1 = resolution_keywords/channels/total_fps/ddr_channel, ...
+CONFIG1 = 1080P/1/15/0, nHD/1/15/0, CIF/1/15/0
+
+[ENCODE_SCALER]
+; CONFIG1 = resolution keywords = channels/total_fps/ddr_channel, ...
+;CONFIG1 = CIF/1/15/0
+
+[ENCODE_DIDN]
+; CONFIG1 = resolution_keywords/channels/total_fps/ddr_channel, ...
+CONFIG1 = 1080P/1/15/0, nHD/1/15/0
+
+[RAW_OUT]
+; CONFIG1 = channels/total_fps/ddr_channel, ...
+
+[LDC_OUT]
+; CONFIG1 = channels/total_fps/ddr_channel, ...
+
+[AUDIO]
+; CONFIG1 = audio_keyword/channels/sample_rate/stereo/bits/ddr_vch
+CONFIG1 = au_grab/1/16K/mono/16/0, au_render/1/16K/mono/16/0
+max_frame_samples = 1548
+grab_buffer_time = 768
+render_buffer_time = 768
+
+[BUFFER_DISPLAY]
+; Display count lcd_vch/count/ddr_channel, lcd_vch/count/ddr_channel, ...
+display_count = 0/3/0
+
+; Playback 3DI input buffer count per channel
+playback_3di_input_count = 0
+
+; Playback scaler input buffer count per channel
+playback_scaler_input_count = 0
+
+[BUFFER_BITSTREAM]
+; Playback bitstream data buffer: time/ddr_vch
+datain_buffer_time = 0/0
+
+; Record bitstream data buffer: time/ddr_vch
+dataout_buffer_time = 462/0
+
+[BUFFER_CAPTURE]
+; Encode capture buffer three slop: fps/count, fps/count, fps/count
+CONFIG1 = 1080P/15/3, 2M/10/2, 2M/5/1
+CONFIG2 = nHD/15/3, nHD/10/2, nHD/5/1
+CONFIG3 = CIF/15/3, CIF/10/2, CIF/5/1
+capture_max_fps = 15
+
+[BUFFER_ENCODE_DIDN]
+; Encode substream scaler out buffer time
+encode_didn_out_buffer_count = 2
+
+[BUFFER_SUBSTREAM]
+; Encode substream scaler out buffer time
+encode_scaler_out_buffer_count = 0
+
+[BUFFER_RAW]
+raw_out_buffer_count = 0
+
+[BUFFER_LDC]
+ldc_out_buffer_count = 0
+
+[ENCODE_MOTION]
+; Enable motion data under specified resolution by "motion_resolution = D1, CIF..."
+; motion_resolution = CIF
+
+[SNAPSHOT]
+yuv_max_width = 1920
+yuv_max_height = 1080
+max_bitstream_size = 512000
+
+[RESERVED_BUFFER]
+; Reserved buffer ratio for seamless switching usage, such as 4CH 720P->4CH 1080P without any stop
+; To reduce memory usage, set reserved_ratio = 0
+reserved_ratio = 0
+
+No support encode motion data information
+-----------------------------------------------------------------------------------
+   8M  3840x2160  max_frame: 3732480  average:  43690  motion:      0
+   7M  3264x2176  max_frame: 3196108  average: 118374  motion:      0
+   6M  3072x2048  max_frame: 2831155  average: 104857  motion:      0
+   5M  2592x1952  max_frame: 2276812  average:  84326  motion:      0
+   4M  2304x1728  max_frame: 1791590  average:  66355  motion:      0
+   3M  2048x1536  max_frame: 1415577  average:  34952  motion:      0
+1080P  1920x1088  max_frame:  940032  average:  17476  motion:      0
+ 1.3M  1280x1024  max_frame:  589824  average:  21845  motion:      0
+ 1.2M  1280x 960  max_frame:  552960  average:  20480  motion:      0
+1080I  1920x 544  max_frame:  470016  average:  17408  motion:      0
+   1M  1280x 800  max_frame:  460800  average:  17066  motion:      0
+ 720P  1280x 720  max_frame:  414720  average:  15360  motion:      0
+ 960H   960x 576  max_frame:  248832  average:   9216  motion:      0
+ SVGA   800x 608  max_frame:  218880  average:   8106  motion:      0
+ 720I  1280x 368  max_frame:  211968  average:   7850  motion:      0
+   D1   720x 576  max_frame:  186624  average:   4369  motion:      0
+  VGA   640x 480  max_frame:  138240  average:   5120  motion:      0
+  nHD   640x 368  max_frame:  105984  average:   3925  motion:      0
+ 2CIF   368x 608  max_frame:  100684  average:   3729  motion:      0
+  HD1   720x 288  max_frame:   93312  average:   3456  motion:      0
+  CIF   368x 288  max_frame:   47692  average:   2184  motion:      0
+ QCIF   176x 144  max_frame:   20480  average:   2048  motion:      0
+
+-----------------------------------------------------------------------------------
+  disp0_in DDR0 0x0, method(0)
+    (0KB x 1 + 0KB x 0)  x 3
+    ==> 6KB (ddr0)
+
+  enc_cap_out DDR0 1920x1088 1CH fps(15) factor(100)
+           total_fps(15) aver(1CH/15fps/3)
+  enc_cap_out DDR0 640x368 1CH fps(15) factor(100)
+           total_fps(15) aver(1CH/15fps/3)
+  enc_cap_out DDR0 368x288 1CH fps(15) factor(100)
+           total_fps(15) aver(1CH/15fps/3)
+    4080KB x 3
+    460KB x 3
+    207KB x 3
+    ==> 14259KB (ddr0)
+
+  enc_out DDR0 1920x1088 1CH fps(15) time(66) aver_sz(17476) max_sz(940032) count(5)
+  enc_out DDR0 640x368 1CH fps(15) time(66) aver_sz(3925) max_sz(105984) count(5)
+  enc_out DDR0 368x288 1CH fps(15) time(66) aver_sz(2184) max_sz(47692) count(5)
+    2760KB x 1 (win=918KB x2 aver=17KB x5)
+    316KB x 1 (win=103KB x2 aver=3KB x5)
+    145KB x 1 (win=46KB x2 aver=2KB x5)
+    ==> 3222KB (ddr0)
+
+  enc_didn_out DDR0 1920x1088 1CH decuple(20)
+  enc_didn_out DDR0 640x368 1CH decuple(20)
+    4080KB x 2
+    460KB x 2
+    ==> 9088KB (ddr0)
+
+  au_grab_out DDR0 1CH 16K tracks(1) bits(16) samples(1548) latency(768) count(8)
+    6KB x 8
+    ==> 64KB (ddr0)
+
+  au_render_in DDR0 1CH 16K tracks(1) bits(16) samples(1548) latency(768) count(8)
+    3KB x 8
+    ==> 64KB (ddr0)
+
+-----------------------------------------------------------------------------------
+  Reserved buffer ratio=0
+  DDR0 size=26703KB
+-----------------------------------------------------------------------------------
+#### Capture Count ####
+ RES/FPS  1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 40 45 50 55 60
+3840x2160 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  1  1  1  2  2  2  2  3
+3264x2176 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  1  1  1  2  2  2  3  3
+3072x2048 0 0 0 0 0 0 0 0 0  0  0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  1  1  1  2  2  3  3  3
+2592x1952 0 0 0 0 0 0 0 0 0  0  0  0  0  0  1  1  1  1  1  1  1  1  1  1  2  2  2  2  2  2  3  3  4  4  4
+2304x1728 0 0 0 0 0 0 0 0 0  1  1  1  1  1  1  1  1  1  1  2  2  2  2  2  2  2  2  2  2  3  4  4  5  5  6
+2048x1536 0 0 0 0 0 0 0 0 0  1  1  1  1  1  1  1  1  1  1  2  2  2  2  2  3  3  3  3  3  3  5  5  6  7  7
+1920x1088 1 1 1 1 1 1 1 1 1  2  2  2  2  2  3  3  3  3  3  4  4  4  4  4  5  5  5  5  5  6  8  9 10 11 12
+1280x1024 1 1 1 1 1 1 1 1 1  2  2  2  2  2  3  3  3  3  3  4  4  4  4  4  5  5  5  5  5  6  8  9 10 11 12
+1280x 960 1 1 1 1 1 1 1 1 1  2  2  2  2  2  3  3  3  3  3  4  4  4  4  4  5  5  5  5  5  6  8  9 10 11 12
+1920x 544 1 1 1 1 1 1 1 1 1  2  2  2  2  2  3  3  3  3  3  4  4  4  4  4  5  5  5  5  5  6  8  9 10 11 12
+1280x 800 1 1 1 1 1 1 1 1 1  2  2  2  2  2  3  3  3  3  3  4  4  4  4  4  5  5  5  5  5  6  8  9 10 11 12
+1280x 720 1 1 1 1 1 1 1 1 1  2  2  2  2  2  3  3  3  3  3  4  4  4  4  4  5  5  5  5  5  6  8  9 10 11 12
+ 960x 576 1 1 1 1 1 1 1 1 1  2  2  2  2  2  3  3  3  3  3  4  4  4  4  4  5  5  5  5  5  6  8  9 10 11 12
+ 800x 608 1 1 1 1 1 1 1 1 1  2  2  2  2  2  3  3  3  3  3  4  4  4  4  4  5  5  5  5  5  6  8  9 10 11 12
+1280x 368 1 1 1 1 1 1 1 1 1  2  2  2  2  2  3  3  3  3  3  4  4  4  4  4  5  5  5  5  5  6  8  9 10 11 12
+ 720x 576 1 1 1 1 1 1 1 1 1  2  2  2  2  2  3  3  3  3  3  4  4  4  4  4  5  5  5  5  5  6  8  9 10 11 12
+ 640x 480 1 1 1 1 1 1 1 1 1  2  2  2  2  2  3  3  3  3  3  4  4  4  4  4  5  5  5  5  5  6  8  9 10 11 12
+ 640x 368 1 1 1 1 1 1 1 1 1  2  2  2  2  2  3  3  3  3  3  4  4  4  4  4  5  5  5  5  5  6  8  9 10 11 12
+ 368x 608 1 1 1 1 1 1 1 1 1  2  2  2  2  2  3  3  3  3  3  4  4  4  4  4  5  5  5  5  5  6  8  9 10 11 12
+ 720x 288 1 1 1 1 1 1 1 1 1  2  2  2  2  2  3  3  3  3  3  4  4  4  4  4  5  5  5  5  5  6  8  9 10 11 12
+ 368x 288 1 1 1 1 1 1 1 1 1  2  2  2  2  2  3  3  3  3  3  4  4  4  4  4  5  5  5  5  5  6  8  9 10 11 12
+ 176x 144 1 1 1 1 1 1 1 1 1  2  2  2  2  2  3  3  3  3  3  4  4  4  4  4  5  5  5  5  5  6  8  9 10 11 12
+-----------------------------------------------------------------------------------
+bufferSea_ddr0     26703 KB + 0 KB(reserved)
+                   (cacheable)
+-----------------------------------------------------------------------
+   disp0_in     6 KB (DDR0)
+                  fill disp0_in pattern 0x10801080
+                  DDR0 pool free size 26697KB.
+enc_cap_out 14259 KB (DDR0)
+                  fill enc_cap_out pattern 0x10801080
+                  DDR0 pool free size 12438KB.
+ enc_bs_out  3222 KB (DDR0)
+                  DDR0 pool free size 9216KB.
+enc_3di_out  9088 KB (DDR0)
+                  DDR0 pool free size 128KB.
+au_grab_out    64 KB (DDR0)
+                  DDR0 pool free size 64KB.
+au_render_in    64 KB (DDR0)
+                  DDR0 pool free size 0KB.
+datain v0.2 Sep 14 2015 15:29:47
+dataout v0.6 Sep 14 2015 15:29:52
+osd_mg_database_init......osd_type:0
+osd_mg_database_init......osd_type:1
+osd_mg_database_init......osd_type:2
+usr_decode v0.1 Sep 14 2015 15:29:59
+usr_snapshot v0.18 Sep 14 2015 15:29:59 (1920x1080, 500KB)
+usr_getraw v0.5 Sep 14 2015 15:30:00
+usr_cap_source v0.5 Sep 14 2015 15:30:00
+usr_osg v1.9 Sep 14 2015 15:30:01
+usr_osg: (ch_table) 4 ,-1 ,
+usr_process v0.1 Sep 14 2015 15:29:56
+videograph ioctl v0.44
+vpd_master.ko v1.2_fixup_rmmod Sep 14 2015 15:29:32
+vpd_master: chipnr=0.
+loopcomm master init: pack_membus(8106)
+Slave 0:1 is ready(1).
+vpslv set vpslv_dbglevel=0
+
+Frammap: 7104 pages in DDR0 are freed.
+Set EM debug level(0) (0:quiet 1:get/put 2:property 3:semaphore)
+
+Set GraphService debug level(0). (0 for error, 1 for flow, 2 for detail.)
+Set MemoryService debug level(0).
+Set datain debug level(0)
+Set dataout debug level(0)
+vpslv set vpslv_dbglevel=0
+Set VPD debug level(0).
+Debug Level:0
+HW reset
+mnvram_data_write addr:c6800000, data_len:13, crc:1353335765!!. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mnvram.c:158
+mnvram_data_write addr:c6c04000, data_len:13, crc:1353335765!!. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mnvram.c:158
+mnvram_data_write addr:c7008000, data_len:13, crc:1353335765!!. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mnvram.c:158
+mnvram_data_write addr:c79fc000, data_len:13, crc:1353335765!!. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mnvram.c:158
+RTL871X: module init start
+RTL871X: rtl8188fu v4.3.23.4.2_19108.20160818_pDeinit
+RTL871X: build time: Aug 14 2017 17:29:54
+RTL871X: hal_com_config_channel_plan chplan:0x20
+RTL871X: rtw_ndev_init(ra0) if1 mac_addr=<removed>
+usbcore: registered new interface driver rtl8188fu
+RTL871X: module init ret=0
+mnvram_data_write addr:c6800000, data_len:2, crc:1313851691!!. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mnvram.c:158
+mnvram_data_write addr:c6c04000, data_len:2, crc:1313851691!!. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mnvram.c:158
+mnvram_data_write addr:c7008000, data_len:2, crc:1313851691!!. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mnvram.c:158
+mnvram_data_write addr:c79fc000, data_len:2, crc:1313851691!!. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mnvram.c:158
+WDT base virtual address = c947e000
+phy speed is 10, half duplex
+HW reset
+
+Welcome to 1jfiegbqdqhxq@5722@m@u (armv5tel-Linux-3.3.0@/dev/ttyS0/b)
+Grain Media ARM Linux 3.3
+
+Released under GNU GPL
+
+<sn removed>@m@u login:  1 Jan 00:00:29 ntpdate[618]: no servers can be used, exiting
+ADDRCONF(NETDEV_UP): ra0: link is not ready
+[ISP_WARN]: [AWB_M2] $grey_cx_boundary$ is not found!!
+rm: can't remove '/tmp/mipc_pid_info': No such file or directory
+
+##### Apply #1 #####
+audio info: change rec sample rate to 16000
+audio info: change rec channel type to mono
+
+##### Apply #2 #####
+
+##### Apply #3 #####
+
+##### Apply #4 #####
+mnvram_data_write addr:c6800000, data_len:13, crc:1244095461!!. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mnvram.c:158
+mnvram_data_write addr:c6c04000, data_len:13, crc:1244095461!!. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mnvram.c:158
+mnvram_data_write addr:c7008000, data_len:13, crc:1244095461!!. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mnvram.c:158
+mnvram_data_write addr:c79fc000, data_len:13, crc:1244095461!!. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mnvram.c:158
+mnvram_data_write addr:c6800000, data_len:28, crc:-1538077424!!. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mnvram.c:158
+mnvram_data_write addr:c6c04000, data_len:28, crc:-1538077424!!. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mnvram.c:158
+mnvram_data_write addr:c7008000, data_len:28, crc:-1538077424!!. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mnvram.c:158
+mnvram_data_write addr:c79fc000, data_len:28, crc:-1538077424!!. /root/project/src/kernel/gm8136/arm-linux-3.3/module/mnvram/mnvram.c:158
+
+##### Apply #5 #####
+ 1 Jan 00:00:34 ntpdate[793]: no servers can be used, exiting
