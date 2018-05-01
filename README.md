@@ -2,6 +2,8 @@
 
 This repo is about an IP camera I just bought on Amazon for £29.99 delivered.
 
+If you have an interest in this or a similar camera (one which uses www.mipc.com), add to the issue I've raised.  Depending upon interest, I'll publish more....
+
 https://www.amazon.co.uk/gp/product/B074M71BRF/ref=oh_aui_detailpage_o01_s00?ie=UTF8&psc=1
 
 Mine was branded 'OnvianTech 1080P Wi-Fi IP Security Camera', but also known as 'Pannovo 826-x', 'FUJIKAM CCTV Security 1080P 2.0MP WiFi IPCamera'.
@@ -58,3 +60,6 @@ login: can't chdir to home directory '/root'
 
 BusyBox v1.20.1 (2015-03-29 21:56:34 HKT) built-in shell (ash)
 Enter 'help' for a list of built-in commands.```
+
+
+current status: root prompt, ability to start ftpd, etc., but serial access required.
