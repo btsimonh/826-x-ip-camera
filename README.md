@@ -20,15 +20,12 @@ The local webpage is mainly a javascript application, and as such is relatively 
 
 More worrying is that the camera does talk to mipc servers, at least for firmware updates, but it sends a fair bit of encrypted data to the servers, so without convincing documentation or evidence, this data is not to be trusted.
 
-I have obtained an incremental firmware update file (ipc_pack_patch_from_v4.6.2.1706161621.rtl8188fu_to_v5.1.5.1803281502.rtl8188fu.bin), which consists of several parts: an lzma compressed patch to patch a tar file, an executable, a script, and a CRC, plus a few numbers...  A full firmware file is elusive
+I have obtained an incremental firmware update file (ipc_pack_patch_from_v4.6.2.1706161621.rtl8188fu_to_v5.1.5.1803281502.rtl8188fu.bin), which consists of several parts: an lzma compressed patch to patch a tar file, an executable, a script, and a CRC, plus a few numbers...  A full firmware file is elusive.
 
-Ideally, we'd find a way to gain ssh or telnet to the device linux without openning the camera (e.g. here https://github.com/Filipowicz251/mijia-1080P-hacks/issues/1 there is some discussion of hacking a similar Grain 8136 based camera).  The upgrade file gives some hints, but I think I'll need to connect to uboot and extract the full firmware to find something. 
-
-.........
-
-a little later:
+A few days of effort revealed a mechanism for replacing the script file in the upgrade file, which opens up the ability to run telnet/ftp and have root access.
 
 
+Login screen
 ```<removed>@<removed>@m@u@e.<removed> login: root
 Password:
 login: can't chdir to home directory '/root'
@@ -59,10 +56,10 @@ login: can't chdir to home directory '/root'
 
 
 BusyBox v1.20.1 (2015-03-29 21:56:34 HKT) built-in shell (ash)
-Enter 'help' for a list of built-in commands.```
+Enter 'help' for a list of built-in commands.
+```
 
-
-current status: root prompt, ability to start ftpd, etc., but serial access required.
+current status: root prompt, ability to start ftpd, etc.
 
 
 # Update - root access without serial.

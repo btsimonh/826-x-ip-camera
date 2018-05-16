@@ -1,0 +1,97 @@
+The upgrade file was obtained as follows:
+
+On a router through which the IP data is flowing, run
+tcpdump  -nnvXSs 0 -i any host <ip of camera>
+on the camera (whilst offered an upgrade), request the upgrade.
+Note the file requested.
+
+In my case this was 
+ipc_pack_patch_from_v4.6.2.1706161621.rtl8188fu_to_v5.1.5.1803281502.rtl8188fu.bin
+(unfortunately I don't have a log of exactly where from).
+download this file using your browser.
+
+The ipc_pack format has a fairly simple layout, discovered using the hex editor HxD:
+
+8 byte Header:
+69 70 63 5F 70 61 63 6B - 'ipc_pack'
+
+Each of the next sections conforms to the style 
+tag - 1 byte, 
+size - 4 bytes, 
+data - size bytes.
+
+the file proceeds with:
+
+
+01 
+00 00 00 04 
+00 00 00 02  // ?? version??  must be 2??
+
+0B 
+00 00 00 04 
+00 D7 C8 00  // size of tar within /backupfs/ipc_project_v4.6.2.1706161621.rtl8188fu.tar.lzma  = 0xd7c800
+
+0C 
+00 00 00 04 
+00 DF 98 00  // size of new tar once patch has been applied
+
+0D 
+00 00 00 04 
+D5 8F D4 9A  // CRC32 tar within /backupfs/ipc_project_v4.6.2.1706161621.rtl8188fu.tar.lzma
+
+0E 
+00 00 00 04 
+2A 27 DA 44  // CRC32 of new tar once patch has been applied
+
+0F 
+00 18 6D 96  // size of lzma compressed patch file
+5D 00 00 00 04 FF FF FF FF FF FF FF FF 00 40 A7 02 CF D6 41 9F 12....  lzma compressed patch file
+// the format of the binary patch file is unknown
+
+@00186dd0:
+04 
+00 00 84 82  // size of com.mining.app.patch
+7F 45 4C 46 01 01 01 .... // ELF image data for com.mining.app.patch
+
+@0018F257: (script)
+03 
+00 00 0A A2  // size of dev_init.sh
+23 21 2F 62 69 6E 2F 73 68 0A 0A .... data for /mnt.mtd/dev_data/dev_init.sh
+
+@018fcfe: 
+02 
+00 00 00 04    
+FF E1 C6 10 == CRC32 of file excluding 'ipc_pack', and where THESE FOUR BYTES are zero
+
+
+
+
+Successful manual patching of the ipc_patch file can be achieved like this:
+
+using HxD on windows.
+Open the upgrade file.
+Locate the script file, on the right hand side highlight the script file content, and copy it out.  Paste it into your favourite linux line endiing compatible editor.
+Edit the script file to implement what you need.... and copy the resulting text.
+Paste into the right hand side of HxD over the original data.  Highlight the pasted data and note the size (indicated in hex at the bottom of HxD).
+Locate the 4 bytes for the script size, and overwrite them with the new size.
+Go to the end of the file, and overwrite the 4 byte CRC value with 00 00 00 00.
+Highlight the whole file from the eigth byte onwards.
+Ask HxD to give you the CRC32.
+Enter the new CRC into the CRC bytes.
+Save the file under a new name.
+
+Go to the camera local web UI, and in Settings/System, use Upload Upgrade to upload your new file.
+A few seconds later, it will offer you to Restart.
+
+Once restarted, your new script will be in place.
+
+Example script updates are in 
+ipc_pack_patch_from_v1.7.1.1503091547_to_v1.9.5.1510231507.updated.zip
+and
+ipc_pack_patch_from_v4.6.2.1706161621.rtl8188fu_to_v5.1.5.1803281502.rtl8188fu.updated.zip
+
+Note: this procedure works on cameras based on firmware v4.6.2.1706161621.rtl8188fu, other base firmwares are untested.
+
+I had assumed that a factory reset would remove the firmware update, but it did not on my camera, so if you have a camera based on a different firmware update, you may need to get creative to obtain a working upgrade image.
+
+
