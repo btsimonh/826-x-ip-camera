@@ -1,6 +1,6 @@
 The following HTML page congtains information about IPs, web addresses, and camera brand names which use the MIPC protcols;
 
-If your camera is here, it's likely that the firmware is similar in sturcture.
+If your camera is here, it's likely that the firmware is similar in structure.
 
 <html>
     <head>

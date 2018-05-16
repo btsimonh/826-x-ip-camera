@@ -1,0 +1,11 @@
+The JFFS2 filesystem is a slightly older revison than avaialble on ubuntu 16.04.
+
+Be careful if you modify it externally....
+
+
+The filesystem is 6Mbytes, and contains the upgrade file plus configuration.
+
+The running application occupies ~8mbytes.  So, it may be possible to host a complete 'application' within the JFFS2 partition, if such an 'application' was created (e.g. from the SDK samples?).
+
+The complete 'project.tar' is ~14mbytes, but contains a quantity of supporting kernel modules, etc. which I assume any 'application' would need.
+
