@@ -63,3 +63,9 @@ Enter 'help' for a list of built-in commands.```
 
 
 current status: root prompt, ability to start ftpd, etc., but serial access required.
+
+
+# Update - root access without serial.
+
+I have uploaded two 'upgrade' files for different versions of this camera.  These enable root telnet access plus allow for further customisation, see 'upgrade_hacks' folder.
+
