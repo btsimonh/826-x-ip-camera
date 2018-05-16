@@ -1,0 +1,20 @@
+The camera has an SD card slot.
+
+However, when SD card is enabled in the GUI, it formats the card with a proprietary filesystem (?).
+
+It would be nice to be able to run a new FS off the SD card.  
+
+However, attempts to boot from the SD card were inclusive:
+
+1. putting the original FS on the SDcard and asking uboot to boot it seemed to work (but the software promptly erased it...).
+
+2. putting a modified squashfs (made using the mksquashfs from the SDK) on the SD card did not boot.  (maybe it is checksummed in some way?)
+
+
+It would be nice to use the SD card with VFAT.
+
+Attempts to put files in a FAT32 filesystem on the card (e.g. to allow simple modifications and extra storage) resulted in the SD card beign erased, even if disabled in the UI.
+
+Tests were not done rigourously....
+The FS on the formatted card was not easily identifiable.
+
