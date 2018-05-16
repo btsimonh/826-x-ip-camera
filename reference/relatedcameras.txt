@@ -1,0 +1,297 @@
+The following HTML page congtains information about IPs, web addresses, and camera brand names which use the MIPC protcols;
+
+If your camera is here, it's likely that the firmware is similar in sturcture.
+
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html" charset="utf-8">
+        <script type="text/javascript" >
+          if(location.href.indexOf("f=app")>-1)
+          {
+            document.write("<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'/>")
+          }
+        	var m_hostname, m_verinfo, m_httpsport,get_host;
+        	var get_host_mipcm = {
+                    		"222.186.3.5":{domain_name:"zj.mipcm.com"},
+                    		"61.147.109.92":{domain_name:"js.mipcm.com"},
+                    		"218.14.146.199":{domain_name:"jm.mipcm.com"},
+                    		"58.61.153.230":{domain_name:"lg.mipcm.com"},
+                    		"31.204.95.225":{domain_name:"lu.mipcm.com"},
+                    		"150.242.215.21":{domain_name:"us3.mipcm.com"},
+                    		"150.242.215.42":{domain_name:"us2.mipcm.com"},
+                    		"96.46.4.26":{domain_name:"us.mipcm.com"},
+                    		"209.133.212.170":{domain_name:"us10.mipcm.com"},
+                    		"209.133.197.234":{domain_name:"us11.mipcm.com"},
+                    		"162.254.149.214":{domain_name:"us12.mipcm.com"}
+          };
+          var get_host_vimtag = {
+                        "222.186.3.5":{domain_name:"zj.vimtag.com"},
+                        "61.147.109.92":{domain_name:"js.vimtag.com"},
+                        "218.14.146.199":{domain_name:"jm.vimtag.com"},
+                        "58.61.153.230":{domain_name:"lg.vimtag.com"},
+                        "31.204.95.225":{domain_name:"lu.vimtag.com"},
+                        "150.242.215.21":{domain_name:"us3.vimtag.com"},
+                        "150.242.215.42":{domain_name:"us2.vimtag.com"},
+                        "96.46.4.26":{domain_name:"us.vimtag.com"},
+                        "209.133.212.170":{domain_name:"us10.vimtag.com"},
+                        "209.133.197.234":{domain_name:"us11.vimtag.com"},
+                        "162.254.149.214":{domain_name:"us12.vimtag.com"}
+          };
+          var get_hostname = ["54.153.82.107","96.46.4.26","58.61.153.230","31.204.95.225","s0.mipcgw.com"];
+          function GetUrlParms()    
+          {
+             var args,query,pairs;
+             args=new Object();   
+             query=location.search.substring(1); 
+             pairs=query.split("&");  
+             for(var   i=0;i<pairs.length;i++)   
+             {   
+                var pos=pairs[i].indexOf('=');  
+                if(pos==-1)   continue; 
+                var argname=pairs[i].substring(0,pos);   
+                var value=pairs[i].substring(pos+1);  
+                args[argname]=unescape(value); 
+             }
+             return args;
+          }
+          function message(obj)
+          {
+             if(obj && obj.type=="cmipcgw_get_ack")
+             {
+                if(obj && obj.data && obj.data.result=="" && obj.data.server.signal && obj.data.server.signal[0])
+                {
+                    var urlparm=GetUrlParms(), proto= ("https:" == window.location.protocol)?"https://":"http://",m_ver,m_sub_ver,m_sub_ver_first,
+                    host,server_ip = obj.data.server.signal[0].substring(obj.data.server.signal[0].indexOf("//")+2,obj.data.server.signal[0].lastIndexOf(":")),
+										temp0,t0=null,temp1,temp2,t2=null,pc_client=0;
+
+                    var web_url = window.location.href;
+                    var oem_domain = web_url.substring(web_url.indexOf("=")+1);	
+                    for(i=0;i<get_hostname.length;i++)
+                    {
+                      if(get_hostname[i]==m_hostname) m_hostname = oem_domain;
+                    }
+                    if(m_hostname.indexOf("vimtag")>-1)
+                    {
+                      get_host = get_host_vimtag;
+                    }else
+                    {
+                      get_host = get_host_mipcm;
+                    }
+                    for(temp0 in get_host)
+										{
+											if(temp0==server_ip)
+											{
+												t0 = get_host[temp0];											
+											}
+										}	
+										if(!t0) t0=get_host["209.133.212.170"];
+											
+										for(j=0;j<m_verinfo.ip.length;j++)
+										{
+											if(m_verinfo.ip[j]==server_ip || m_verinfo.ip[j]=="all")
+											{
+												m_ver = m_verinfo.cn.ver;
+												m_sub_ver = m_verinfo.cn.sub_ver;
+												(!m_verinfo.cn.sub_ver_first)?(m_sub_ver_first=0):(m_sub_ver_first=1);
+											}
+										}	
+										if(!m_ver || !m_sub_ver)
+										{
+											m_ver = m_verinfo.dft.ver;
+											m_sub_ver = m_verinfo.dft.sub_ver;
+											(!m_verinfo.dft.sub_ver_first)?(m_sub_ver_first=0):(m_sub_ver_first=1);
+										}			                              
+                    if(proto == "https://")
+                    {																										
+											// host = t0.domain_name + ":"+ ((!m_httpsport)?"7443":m_httpsport);
+                      if(t0.domain_name.indexOf("mipcm")>-1){
+                        host = t0.domain_name + ":"+ obj.data.server.signal[0].substring(obj.data.server.signal[0].lastIndexOf("080")-1,obj.data.server.signal[0].lastIndexOf("080")) + "443";
+                      }else if(t0.domain_name.indexOf("vimtag")>-1){
+                        host = t0.domain_name + ":"+ obj.data.server.signal[0].substring(obj.data.server.signal[0].lastIndexOf("080")-1,obj.data.server.signal[0].lastIndexOf("080")) + "446";
+                      }
+                    }
+                    else{
+                     	host = obj.data.server.signal[0].substring(obj.data.server.signal[0].indexOf("//")+2,obj.data.server.signal[0].lastIndexOf("/"));
+                    }                        
+                    if(urlparm.id)
+				           	{
+					              document.body.innerHTML = "<iframe src='"+proto+host+ "/version/v1/main.htm?v1.11.4.1502061647&m=" + m_hostname + "&u="+urlparm.u+"&p="+urlparm.t+"&r="+urlparm.m+"&id="+urlparm.id+"'></iframe>";
+				           	}
+										else if(urlparm.u)
+                    {
+                        document.body.innerHTML = "<iframe src='"+proto+host+ "/version/v1/main.htm?v1.11.4.1502061647&m=" + m_hostname + "&u="+urlparm.u+"&p="+urlparm.t+"&r="+urlparm.m+"'></iframe>";
+                    }
+                    else
+                    {
+                    	if(m_sub_ver_first){
+                        var DisplayApp = location.href.indexOf("f=app")>-1?"&f=app":"";
+                        DisplayApp += location.href.indexOf("h=faq")>-1?"&h=faq":"";
+                        document.body.innerHTML = "<iframe src='"+proto+host+ "/"+m_sub_ver+"/"+m_ver+"/main."+((m_sub_ver!="v1")?(m_sub_ver+"."):(""))+"htm?"+m_ver+"&m="+m_hostname + DisplayApp+"'></iframe>";
+                      }else{
+                        document.body.innerHTML = "<iframe src='"+proto+host+ "/"+m_ver+"/"+m_sub_ver+"/main."+((m_sub_ver!="v1")?(m_sub_ver+"."):(""))+"htm?"+m_ver+"&m="+m_hostname + "'></iframe>";
+                      }
+                    }                       
+                } 
+             }
+          }
+          function start(){
+                    var s, m_pagetitle,temp, tp = null,
+                    //start_tls
+                     tls = {
+                     	  "www.mipcm.com":{m_title:"MIPC",m_scheme:"mipcm"},
+	                    	"www.luxcamapp.eu":{m_title:"Luxcam",m_scheme:"luxsecurityluxcam"},
+	                    	"kh.gtscn.cn":{m_title:"-GAKATO-SMARTHOME",m_scheme:"guangsudagsdcn"},
+	                    	"www.62918040.cn":{m_title:"富尼手机看家宝",m_scheme:"http"},
+	                    	"www.mymobivue.com":{m_title:"MobiVue",m_scheme:"teamresearchastak"},
+	                    	"www.hentek.cc":{m_title:"hentek",m_scheme:"hentekhentekipcam"},
+	                    	"www.axiton360.com":{m_title:"AXTION",m_scheme:"axitonaxiton"},
+	                    	"1999.wanliyan.com":{m_title:"万里眼",m_scheme:"dongsyswanliyan"},
+	                    	"www.joinlink.org":{m_title:"iCare",m_scheme:"ruiyunicare"},
+	                    	"www.avuecam.com":{m_title:"AVUEcam",m_scheme:"sequtecavuecam"},
+	                    	"www.tpcc2014.com":{m_title:"TPCC",m_scheme:"tungpotpcc"},
+	                    	"www.chcvip.cn":{m_title:"CHCV",m_scheme:"ruifengchcv"},
+	                    	"www.jiayang.com":{m_title:"讯视天下",m_scheme:"jiayangshixuntianxia"},
+	                    	"v.onevo.cn":{m_title:"小O安全卫士",m_scheme:"ovorangeweishi"},
+	                    	"www.eyedot.net":{m_title:"EYE DOT",m_scheme:"keepereyedot"},
+	                    	"www.sztkaj.com":{m_title:"特凯安居",m_scheme:"sztekaitekaianju"},
+	                    	"www.devele.com":{m_title:"DEVELE IPC",m_scheme:"develeipc"},
+	                    	"www.itelland.com":{m_title:"现场眼",m_scheme:"itellanditelcamera"},
+	                    	"1clic.smartcamhd.com":{m_title:"SmartCam HD 1Clic",m_scheme:"macwaysmartcam"},
+	                    	"www.goolsee.com":{m_title:"谷视",m_scheme:"goolseegoolsee"},
+	                    	"www.anylook.net":{m_title:"Any Look",m_scheme:"yescctvanylook"},
+	                    	"www.myannke.com":{m_title:"ANNKE",m_scheme:"anniannke"},
+	                    	"www.mommycam.us":{m_title:"Mommycam",m_scheme:"mommymommycam"},
+	                    	"www.cloudring.com":{m_title:"Cloudring",m_scheme:"figiganticcloudring"},
+	                    	"www.fujikamcloud.us":{m_title:"MIPC",m_scheme:"miningmipc"},
+	                    	"www.fujikamcloud.com":{m_title:"MIPC",m_scheme:"miningmipc"},
+	                    	"ipcam.konka.com":{m_title:"KonkaIpCam",m_scheme:"konkaipcam"},
+	                      "www.nmspay.cn":{m_title:"NMS",m_scheme:"sanlianhenms"},
+	                      "www.prolabcloud.com":{m_title:"PROLAB CLOUD",m_scheme:"prolabcloud"},
+	                      "ehawk.hootoo.com":{m_title:"E-HAWK", m_scheme:"hootoo"},
+	                      "www.vimtag.com":{m_title:"Vimtag",m_scheme:"vimtag",m_port:"7446"},
+	                      "test.mipcm.com":{
+	                      	m_title:"MIPC",
+	                      	m_scheme:"testmipcm",
+	                      	config:{
+														ip:["all"],
+														cn:{ver:"version",sub_ver:"v2n"},
+														dft:{ver:"version",sub_ver:"v1"}
+												  }
+												},
+	                      "v1.mipcm.com":{
+		      								m_title:"MIPC",
+		      								m_scheme:"mipcmv1", 
+		      								config:{
+														ip:["all"],
+														cn:{ver:"version",sub_ver:"v1"},
+														dft:{ver:"version",sub_ver:"v2n"}
+													}
+												},
+	                      "v2.mipcm.com":{
+	                      	m_title:"MIPC",
+	                      	m_scheme:"mipcmv2n",
+	                      	config:{
+														ip:["all"],
+														cn:{ver:"version",sub_ver:"v2n"},
+														dft:{ver:"version",sub_ver:"v1"}
+													}
+												},
+	                      "v3.vimtag.com":{
+	                      	m_title:"Vimtag",
+	                      	m_scheme:"vimtagv3",
+	                      	config:{
+														ip:["all"],
+														cn:{ver:"version",sub_ver:"v2n"},
+														dft:{ver:"version",sub_ver:"v1"}
+												  }
+												},
+                        "v4.vimtag.com":{
+                          m_title:"Vimtag",
+                          m_scheme:"vimtagv4",
+                          config:{
+                            ip:["all"],
+                            cn:{ver:"version",sub_ver:"product", sub_ver_first:"1"},
+                            dft:{ver:"version",sub_ver:"product", sub_ver_first:"1"}
+                          }
+                        },
+	                      "zygj.jointem.com":{m_title:"掌云管家",m_scheme:"jiontem"},
+	                      "cloud.serenelifehome.com":{m_title:"SereneViewer",m_scheme:"serenelifehome"},
+	                      "www.itacamapp.com":{m_title:"ITACAM", m_scheme:"itacam"},
+	                      "default":{
+	                      	m_title:"IPC",
+	                      	m_scheme:"MIPC",
+	                      	config:{
+														ip:["222.186.3.5","61.147.109.92","218.14.146.199","58.61.153.230"],
+														cn:{ver:"version",sub_ver:"v2n"},
+														dft:{ver:"version",sub_ver:"v1"}
+													}
+												}
+                     };
+                     //end_tls
+                    
+                  	//set the title base domain
+                    m_hostname=window.location.hostname;
+                    var dit_len = m_hostname.split(".").length;
+                    if(dit_len==2)
+                    {
+                    	m_hostname="www." + window.location.hostname;
+                    }
+                    for(temp in tls)
+                    {
+                    	if(temp==m_hostname||temp.substring(temp.indexOf('.')+1,temp.length)==m_hostname)
+                    	{
+                    	    tp = tls[temp];
+                    		  m_pagetitle = tp.m_title;
+                    		  if(tp.m_port) m_httpsport = tp.m_port;
+                    			if(tp.config)
+                    			{
+                    				m_verinfo = tp.config;
+                    			}                   			
+                    	}
+                    }
+                    if(!m_verinfo) m_verinfo = tls["default"].config; 
+                    if(m_pagetitle&&(""!=m_pagetitle)){ document.title = m_pagetitle; }else{document.title = "MIPC";};
+                    	
+                    var urlp=GetUrlParms();	
+                    var m_userAgent = navigator.userAgent;
+                    var is_skip=(urlp.m=="aa"||urlp.m=="pr")?1:0;	
+                    var is_mobile=(m_userAgent.indexOf('iPhone') > -1||m_userAgent.indexOf('iPad') > -1||m_userAgent.indexOf('Android') > -1)?1:0;	//是否为IOS或Android访问
+                    if(is_mobile && is_skip && tp && tp.m_scheme && (tp.m_scheme != "http"))
+                    {
+                        var url=window.location.href.replace(/^http/g,tp.m_scheme);
+                        window.location.href=url;
+                    }
+                    else
+                    {
+                        if( window.location.hostname.indexOf( "i-live.net.cn" ) > -1
+                        || window.location.hostname == "58.61.153.230" ){
+                            document.title = "";
+                            document.write("404: unable to diplay this page");
+                        }
+                        else{
+                        	s=document.createElement("script");
+                        	s.setAttribute("type","text/javascript");
+                        	s.setAttribute("src","/cmipcgw/cmipcgw_get_req.js?name=appid&value=mipcm.com");
+                       	    document.getElementsByTagName('head').item(0).appendChild(s);
+                        }
+                    }
+          }
+          
+        </script>
+        
+        <style type="text/css">
+           html,body,#iframe_div,iframe{
+	            height:100%; 
+	            width:100%;
+	            margin:0;
+	            padding:0;
+	            overflow:hidden; 
+	            position:relative;
+	            border:0;
+           }
+        </style>
+        <title></title>
+    </head>
+    <body onload="start()">
+    </body>
+</html>

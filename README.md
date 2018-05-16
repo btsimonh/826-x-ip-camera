@@ -24,8 +24,12 @@ I have obtained an incremental firmware update file (ipc_pack_patch_from_v4.6.2.
 
 A few days of effort revealed a mechanism for replacing the script file in the upgrade file, which opens up the ability to run telnet/ftp and have root access.
 
+# work to do, can you help?
 
-Login screen
+For a more general mod to the upgrade file, we would need to understand the patch mechanism.  With this, it may be possible to make an upgrade file for cameras which have no upgrade file available (by making a patch file which does nothing, and knowing the CRC of the orignal TAR file present in firmware extracted from having a serial connection).
+
+
+# Login screen
 ```<removed>@<removed>@m@u@e.<removed> login: root
 Password:
 login: can't chdir to home directory '/root'
