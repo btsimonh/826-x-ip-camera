@@ -70,3 +70,8 @@ current status: root prompt, ability to start ftpd, etc.
 
 I have uploaded two 'upgrade' files for different versions of this camera.  These enable root telnet access plus allow for further customisation, see 'upgrade_hacks' folder.
 
+# Update - privacy assured
+
+I beleive that the scripts in `modificationscripts` will convincingly stop the camera from being able to send anything to the internet servers - basically by removing the default gateway, so allowing the IP layer to only talk to the local LAN.
+
+You can still use the local web interface, and with a little playing should be able to integrate the camera output into other local video destinations.
