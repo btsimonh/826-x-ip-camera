@@ -1,0 +1,1016 @@
+[
+    {
+        "id": "afcdbffc.f49d3",
+        "type": "tab",
+        "label": "CloudCamera",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "3db26815.070bc8",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 100,
+        "y": 40,
+        "wires": [
+            [
+                "d4b5d2a4.7b7e1"
+            ]
+        ]
+    },
+    {
+        "id": "3656ebb6.91acd4",
+        "type": "http request",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "method": "GET",
+        "ret": "bin",
+        "url": "",
+        "tls": "",
+        "x": 490,
+        "y": 60,
+        "wires": [
+            [
+                "898c8934.bc7e18",
+                "64ea1229.c754cc"
+            ]
+        ]
+    },
+    {
+        "id": "898c8934.bc7e18",
+        "type": "debug",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "true",
+        "x": 750,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "64ea1229.c754cc",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ParseResponse",
+        "func": "var ccm = flow.get('ccm');\n\nif (msg.statusCode === 'ECONNRESET'){\n    if (msg.url.indexOf('mmq_pick') > -1){\n        // re-subscribe on timeout\n        node.error(\"Timeout mmq_pick - re-subscribe\");\n        ccm.ccm_subscribe();\n        return;\n    }\n}\n\nnode.warn(msg);\n\nswitch(msg.headers['content-type']){\n    case 'image/jpg':\n        // image as requested\n        node.warn(\"jpeg image received\");\n        node.send([null, {\n            cmd:'store', \n            payload:msg.payload, \n            imageurl:'/latestimage2?time='+(new Date()).valueOf(),\n            img: '<img ng-style=\"{ width : 100% }\" src=\"/latestimage2\"/>'\n        }]);\n        break;\n    case 'application/x-javascript':\n        // should be a response message as text\n        msg.payload = msg.payload.toString();\n        if (msg.payload.startsWith){\n            if (msg.payload.startsWith('message(')){\n                msg.payload = msg.payload.slice(8, -2);\n                //node.warn(msg.payload);\n                node.warn(msg.payload);\n                var res = eval('test = '+msg.payload+';');\n                \n                node.warn(res);\n                switch(res.type){\n                    case 'ccm_info_get_ack':\n                        ccm.type = res.data.type; //IPC\n                        ccm.sn = res.data.sn;\n                        ccm.nick = res.data.nick;\n                        ccm.ver = res.data.ver;\n                        ccm.spv = res.data.spv;\n                        ccm.cacs_dh_req();\n                        return;\n                        break;\n                    case 'cacs_dh_ack':\n                        ccm.key_b2a = res.data.key_b2a;\n                        ccm.lid = res.data.lid;\n                        ccm.tid = res.data.tid;\n                        ccm.did = res.data.did;\n                        node.warn(ccm);\n                        ccm.cacs_login_req();\n                        return;\n                        break;\n                    case 'cacs_login_ack':\n                        ccm.login_ack = res.data;\n                        node.warn(ccm.login_ack);\n                        ccm.mmq_create();\n                        return;\n                        break;\n                    case 'mmq_create_ack':\n                        ccm.qid = res.data.qid;\n                        node.warn(res);\n                        ccm.ccm_subscribe();\n                        return;\n                        break;\n                        \n                    case 'ccm_net_get_ack':\n                        ccm.net_info = res.data.info;\n                        node.warn(ccm.net_info);\n                        break;\n                        \n                    case 'ccm_play_ack':\n                        ccm.play_info = res.data;\n                        node.warn(ccm.play_info);\n                        break;\n                        \n                    case 'ccm_subscribe_ack':\n                        ccm.mmq_pick();\n                        return;\n                        break;\n                    case 'ccm_msg':\n                        ccm.lastmsg = res.data;\n                        node.warn(\"ccm_msg received, re-ask\");\n                        ccm.mmq_pick();\n                        break;\n                }\n                \n                msg.payload = res;\n                return msg;\n            }   \n        }\n        break;\n    case 'text/html;Charset=utf-8':\n        msg.payload = msg.payload.toString();\n        node.error(msg);\n        break;\n    default:\n        msg.payload = msg.payload.toString();\n        node.error(\"unhandled content-type:\"+msg.headers['content-type']);\n        node.error(msg);\n        break;\n}\n\n\n",
+        "outputs": "2",
+        "noerr": 0,
+        "x": 500,
+        "y": 120,
+        "wires": [
+            [
+                "69a87782.11d578"
+            ],
+            [
+                "b9146780.827b58",
+                "e3c04c62.23bd9"
+            ]
+        ]
+    },
+    {
+        "id": "e65d0620.6d46f8",
+        "type": "debug",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 1010,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "d4b5d2a4.7b7e1",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "init",
+        "func": "var require = global.get('require');\nvar crypto = require('crypto');\nvar querystring = require(\"querystring\");\n\nvar ccm = {\n    url: '',\n    from_handle:Math.floor(1E6 * Math.random()),\n    sn: '',\n    user: '',\n    pass: '',\n    nid_seq: 0,\n\n    dec2hex: function(str, numbytes){ // .toString(16) only works up to 2^53\n        var dec = str.toString().split(''), sum = [], hex = [], i, s\n        while(dec.length){\n            s = 1 * dec.shift()\n            for(i = 0; s || i < sum.length; i++){\n                s += (sum[i] || 0) * 10\n                sum[i] = s % 16\n                s = (s - sum[i]) / 16\n            }\n        }\n    \n        while(sum.length){\n            hex.push(sum.pop().toString(16))\n        }\n        \n        var res = hex.join('');\n        \n        return this.padhex(res, numbytes);\n    },\n    \n    padhex: function(hex, numbytes){\n        if (!numbytes)\n            return hex;\n            \n        // add enough leading zero    \n        for (var i = 0; i < numbytes-1; i++){\n            hex = '00'+hex;\n        }\n        return hex.slice(-(numbytes*2));\n    },\n    \n    get_encpass: function(pass, secret_dec_str){\n        var t = {};\n        t.my_pwdmd5 = crypto.createHash('md5').update(pass).digest('hex');\n        t.my_pwdmd5buff = new Buffer(t.my_pwdmd5, 'hex');\n        t.key_md5 = crypto.createHash('md5').update(secret_dec_str).digest('hex');\n        t.key_md5buff = new Buffer(t.key_md5, 'hex');\n        t.DES_key = t.key_md5buff.slice(0, 8); // only use first 8 bytes (64 bits)\n        t.iv_buff = new Buffer('0000000000000000', 'hex');\n        //node.warn(t);\n        \n        var encoder = crypto.createCipheriv('des', t.DES_key, t.iv_buff);\n        encoder.setAutoPadding(false);\n        var buf1 = encoder.update(t.my_pwdmd5buff);\n        var buf2 = encoder.final();\n        var out_buff = Buffer.concat([buf1, buf2]);\n        var out = out_buff.toString('hex');\n        return out;\n    },\n    \n    \n    largeint: {\n    \n    // Adds two arrays for the given base (10 or 16), returning the result.\n    // This turns out to be the only \"primitive\" operation we need.\n        add: function (x, y, base) {\n          var z = [];\n          var n = Math.max(x.length, y.length);\n          var carry = 0;\n          var i = 0;\n          while (i < n || carry) {\n            var xi = i < x.length ? x[i] : 0;\n            var yi = i < y.length ? y[i] : 0;\n            var zi = carry + xi + yi;\n            z.push(zi % base);\n            carry = Math.floor(zi / base);\n            i++;\n          }\n          return z;\n        },\n    \n        // Returns a*x, where x is an array of decimal digits and a is an ordinary\n        // JavaScript number. base is the number base of the array x.\n        multiplyByNumber:function (num, x, base) {\n          if (num < 0) return null;\n          if (num == 0) return [];\n        \n          var result = [];\n          var power = x;\n          while (true) {\n            if (num & 1) {\n              result = this.add(result, power, base);\n            }\n            num = num >> 1;\n            if (num === 0) break;\n            power = this.add(power, power, base);\n          }\n        \n          return result;\n        },\n        \n        parseToDigitsArray: function (str, base) {\n          var digits = str.split('');\n          var ary = [];\n          for (var i = digits.length - 1; i >= 0; i--) {\n            var n = parseInt(digits[i], base);\n            if (isNaN(n)) return null;\n            ary.push(n);\n          }\n          return ary;\n        },\n        \n        convertBase: function(str, fromBase, toBase) {\n          var digits = this.parseToDigitsArray(str, fromBase);\n          if (digits === null) return null;\n        \n          var outArray = [];\n          var power = [1];\n          for (var i = 0; i < digits.length; i++) {\n            // invariant: at this point, fromBase^i = power\n            if (digits[i]) {\n              outArray = this.add(outArray, this.multiplyByNumber(digits[i], power, toBase), toBase);\n            }\n            power = this.multiplyByNumber(fromBase, power, toBase);\n          }\n        \n          var out = '';\n          for (var i = outArray.length - 1; i >= 0; i--) {\n            out += outArray[i].toString(toBase);\n          }\n          return out;\n        },\n        \n        decToHex: function (decStr) {\n          var hex = this.convertBase(decStr, 10, 16);\n          return hex ? '0x' + hex : null;\n        },\n        \n        hexToDec: function(hexStr) {\n          if (hexStr.substring(0, 2) === '0x') hexStr = hexStr.substring(2);\n          hexStr = hexStr.toLowerCase();\n          return this.convertBase(hexStr, 16, 10);\n        },\n    },\n    \n    Y64: function(data, set_to_use) {\n        var set1 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.-';\n        var set0 = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=\"\n        var set_str = set_to_use ? set1:set0;\n        \n        var len = data.length;\n        var posn = 0;\n        var out = '';\n        \n        while (posn < len) {\n            var bit;\n            var value = 0;\n            \n            // create 3 byte value\n            for (bit = 0; bit < 24 && posn < len; bit += 8,++posn){\n                value = (value << 8) + data.charCodeAt(posn);\n            }\n            \n            // write 4 byte value\n            for (var bit2 = 0; bit2 < 24; bit2 += 6, value &= (1 << (bit - bit2)) - 1){\n                var bitoffset = bit - bit2 - 6;\n                out += (bit2 < bit) ? set_str.charAt(0 > bitoffset ? value << -bitoffset : value >> bitoffset) : \"\";\n            }\n        }\n        return out\n    },\n    \n\n    hex_digit_to_num: function(charcode){\n        if ((charcode >= 0x30) && (charcode <= 0x39)){\n            return charcode - 0x30;\n        }\n        if ((charcode >= 0x61) && (charcode <= 0x61+6)){\n            return charcode - 0x61 + 10;\n        }\n        if ((charcode >= 0x41) && (charcode <= 0x41+6)){\n            return charcode - 0x41 + 10;\n        }\n        node.warn(\"not hex\");\n        return 0\n    },\n\n    to_binary: function(data_in, minlen) {\n        var bit;\n        var d;\n        var out = \"\";\n        var data = \"\" + data_in;\n        // if hex\n        if (0 === data.indexOf(\"0x\")){\n            for (var i = data.length - 1; 1 < i; ) {\n                var g = 0;\n                for (bit = 0; (8 > bit) && (1 < i); --i, bit += 4){\n                    g += (this.hex_digit_to_num(data.charCodeAt(i)) << bit);\n                }\n                out = String.fromCharCode(g) + out;\n            }\n        } else {\n            // expect a number\n            for (bit = 24; 0 <= bit; bit -= 8){\n                if (data_in >= (1 << bit)){\n                    out += String.fromCharCode(data_in >> bit & 255);\n                }\n            }\n        }\n                \n        for (; out.length < minlen; )\n            out = \"\\x00\" + out;\n            \n        return out\n    },\n\n\n\n    makenid: function(seq_no, lid, secret_dec, g, f, l){\n        var seq_bin = this.to_binary(seq_no);\n        \n        lid_bin = lid ? this.to_binary(lid) : \"\";\n        c = lid ? this.to_binary(g) : \"\";\n        l = l ? this.to_binary(\"0x\" + h[m](l)) : \"\";\n        \n        var parts = [];\n        \n        parts.push((seq_bin ? String.fromCharCode(64 + seq_bin.length) + seq_bin : \"\"));\n        parts.push((lid_bin ? String.fromCharCode(96 + lid_bin.length) + lid_bin : \"\")); \n        parts.push((c ? String.fromCharCode(128 + c.length) + c : \"\"));\n        parts.push((f ? String.fromCharCode(160 + f.length) + f : \"\"));\n    \n        // part e.\n        var to_md5 = parts.join('') + \n            (secret_dec ? String.fromCharCode(0 + secret_dec.length) + secret_dec : \"\") + \n            (l ? String.fromCharCode(0 + l.length) + l : \"\");\n    \n        \n        node.warn(parts);\n    \n        // convert to buffer\n        var buff = new Buffer(to_md5.length);\n        for (var i = 0; i < to_md5.length; i++){\n            buff[i] = to_md5.charCodeAt(i);\n        }\n        \n        var md5 = \"0x\" + crypto.createHash('md5').update( buff ).digest('hex');\n        var md5_bin = this.to_binary(md5);\n    \n        parts.unshift(md5_bin);\n        parts.unshift(String.fromCharCode(32 + md5_bin.length));\n    \n        res = parts.join('');\n    \n\n        buff = new Buffer(res.length);\n        for (i = 0; i < res.length; i++){\n            buff[i] = res.charCodeAt(i);\n        }\n    \n        return this.Y64(res, 1);\n    },\n    \n    \n    send_msg: function( name, structure, something, callback ){\n        var url = this.url+'/ccm/'+name+'?';\n        \n        node.warn(\"send msg \"+name);\n        \n        this.from_handle++;\n    \n        url = url + 'h' + 'from_handle' + '=' + this.from_handle;\n        \n        if (this.qid){\n            url = url + '&h' + 'qid' + '=' + this.qid;\n        }\n        \n        var keys = Object.keys(structure);\n        for (var i = 0; i < keys.length; i++){\n            if (Array.isArray(structure[keys[i]])){\n                url = url + '&d' + keys[i] + '__x_countz_=' + structure[keys[i]].length;\n                //dtokens__x_countz_=2&\n                //dtokens=eth0&\n                //dtokens_1=ra0&\n    \n                for(var j = 0; j < structure[keys[i]].length; j++){\n                    if (typeof structure[keys[i]][j] === 'string'){\n                        var tag = '&d' + keys[i];\n                        if (j > 0){\n                            tag = tag +'_'+j;\n                        }\n                        url = url + tag + '=' + querystring.escape(structure[keys[i]][j]);\n                    } else {\n                        url = url + '&d' + keys[i] + '=' + (j+1);\n                        url = url + '&d' + keys[i] + '_name=' + querystring.escape(structure[keys[i]][j].name);\n                        url = url + '&d' + keys[i] + '_value=' + querystring.escape(''+structure[keys[i]][j].value);\n                    }\n                }\n            } else {\n                url = url + '&d' + keys[i] + '=' + querystring.escape(''+structure[keys[i]]);\n            }\n        }\n        \n        var newmsg = {\n            url: url,\n            payload:''\n        };\n        node.send([null, newmsg]);\n    },\n\n    \n    \n    \n    // functions to connect/control camera\n    ccm_info_get: function(){\n        this.send_msg(\n            \"ccm_info_get.js\", \n            {\n            }\n        );\n    },\n    \n    cacs_dh_req: function(){\n        this.send_msg(\n            \"cacs_dh_req.js\", \n            {\n                bnum_prime: this.prime,\n                root_num: 5,\n                key_a2b: this.public,\n                tid: this.tid\n            }\n        );\n    },\n    \n    \n    cacs_login_req: function(){\n        this.key_b2a_hex = this.dec2hex(ccm.key_b2a, 16);\n        \n        this.login_secret_hex = this.sdh.computeSecret(this.key_b2a_hex, 'hex', 'hex');\n        this.login_secret_dec = this.largeint.hexToDec(this.login_secret_hex);\n        var pwd_to_send = this.get_encpass(this.pass, this.login_secret_dec);\n        \n        var type = 2;\n        var newnid = this.makenid(++this.nid_seq, type ? this.lid:0, this.login_secret_dec, type, null, null);\n        var data =  {\n                lid: this.lid,\n                nid: newnid,\n                user: this.user,\n                pass: pwd_to_send,\n                session_req: 1,\n                param: [{\n                    name: \"spv\",\n                    value: \"v1\"\n                }]\n            };\n            \n        this.send_msg(\n            \"cacs_login_req.js\", \n            data\n        );\n    },\n    \n    mmq_create: function(){\n        this.send_msg(\n            \"mmq_create.js\", \n            { timeout: 30000 }\n        );\n    },\n    \n    ccm_devs_get: function(){\n        var type = 2;\n        var newnid = this.makenid(++this.nid_seq, type ? this.lid:0, this.login_secret_dec, type, null, null);\n        var data =  {\n                lid: this.lid,\n                sess: 1,\n                sess_nid: newnid,\n                start:0,\n                counts:128\n            };\n            \n        this.send_msg(\n            \"ccm_devs_get.js\", \n            data\n        );\n    },\n    \n    \n    ccm_net_get: function(){\n        var type = 2;\n        var newnid = this.makenid(++this.nid_seq, type ? this.lid:0, this.login_secret_dec, type, null, null);\n        var data =  {\n                sess: 1,\n                sess_nid: newnid,\n                sess_sn: this.sn,\n                tokens:[\n                    \"eth0\",\n                    \"ra0\"\n                ],\n                items:[\n                    \"all\",\n                    \"all\"\n                ],\n                force_scan:1\n            };\n            \n        this.send_msg(\n            \"ccm_net_get.js\", \n            data\n        );\n    },\n    \n\n    ccm_play: function( profile, protocol ){\n        \n        if (!profile){\n            profile = 'p0';\n        }\n        \n        if (!protocol){\n            protocol = 'rtmp';\n        }\n        \n        var type = 2;\n        var newnid = this.makenid(++this.nid_seq, type ? this.lid:0, this.login_secret_dec, type, null, null);\n        var data =  {\n                sess: 1,\n                sess_nid: newnid,\n                sess_sn: this.sn,\n                setup:1,\n                setup_stream:'RTP_Unicast',\n                setup_trans:1,\n                setup_trans_proto: protocol,\n                token: profile\n            };\n            \n        ccm.send_msg(\n            \"ccm_play.js\", \n            data\n        );\n    },\n    \n    \n    ccm_subscribe: function(){\n        var type = 2;\n        var newnid = this.makenid(++this.nid_seq, type ? this.lid:0, this.login_secret_dec, type, null, null);\n        \n        var data =  {\n                sess: 1,\n                sess_nid: newnid,\n                sess_sn: this.sn\n            };\n            \n        \n        this.send_msg(\n            \"ccm_subscribe.js\", \n            data\n        );\n    },\n    \n    mmq_pick: function(){\n        var type = 2;\n        //var newnid = ccm.makenid(++ccm.nid_seq, type ? ccm.lid:0, ccm.login_secret_dec, type, null, null);\n        \n        var data =  {\n                qid:this.qid,\n                timeout:300000\n            };\n            \n        \n        this.send_msg(\n            \"mmq_pick.js\", \n            data\n        );\n    },\n    \n    ccm_profiles_get: function(){\n        var type = 2;\n        var newnid = this.makenid(++this.nid_seq, type ? this.lid:0, this.login_secret_dec, type, null, null);\n        var data =  {\n                sess: 1,\n                sess_nid: newnid,\n                sess_sn: this.sn\n            };\n            \n        ccm.send_msg(\n            \"ccm_profiles_get.js\", \n            data\n        );\n    },\n\n    ccm_snapshot: function(profile){\n        if (!profile){\n            profile = 'p0';\n        }\n\n        var type = 2;\n        var newnid = this.makenid(++this.nid_seq, type ? this.lid:0, this.login_secret_dec, type, null, null);\n        var data =  {\n                sess: 1,\n                sess_nid: newnid,\n                sess_sn: this.sn,\n                token: profile\n            };\n            \n        ccm.send_msg(\n            \"ccm_snapshot.js\", \n            data\n        );\n    },\n    \n    \n    ccm_pic_get: function(profile){\n        if (!profile){\n            profile = 'p1';\n        }\n\n        var type = 2;\n        var newnid = this.makenid(++this.nid_seq, type ? this.lid:0, this.login_secret_dec, type, null, null);\n        var data =  {\n                sess: 1,\n                sess_nid: newnid,\n                sess_sn: this.sn,\n                token:profile+'_xxxxxxxxxx'\n            };\n            \n        this.send_msg(\n            \"ccm_pic_get.jpg\", \n            data\n        );\n    },\n    \n    \n    ccm_ptz_ctl: function( x, y, speedx, speedy){\n        \n        var type = 2;\n        var newnid = ccm.makenid(++this.nid_seq, type ? this.lid:0, this.login_secret_dec, type, null, null);\n        var data =  {\n            sess: 1,\n            sess_nid: newnid,\n            sess_sn: ccm.sn,\n            \n            // shuold deal with these as structures/arrays\n            trans: 1,\n            trans_pan_tilt: 1,\n            trans_pan_tilt_x: x,\n            trans_pan_tilt_y: y,\n            speed:1,\n            speed_pan_tilt:1,\n            speed_pan_tilt_x: speedx,\n            speed_pan_tilt_y: speedy\n            \n        };\n\n        this.send_msg(\n            \"ccm_ptz_ctl.js\", \n            data\n        );\n    },\n    \n    \n\n\n};\n\n\nccm.prime = \"791658605174853458830696113306796803\";\nccm.primehex = ccm.dec2hex(\"791658605174853458830696113306796803\", 16); // essential we get the right length\nnode.warn('our prime:'+util.inspect(ccm.primehex));\n\nccm.sdh = crypto.createDiffieHellman(ccm.primehex, 'hex', 5);\n\nccm.public_hex = ccm.sdh.generateKeys('hex');\nccm.public = ccm.largeint.hexToDec(ccm.public_hex);\nccm.private_hex = ccm.sdh.getPrivateKey('hex');\nccm.private = ccm.largeint.hexToDec(ccm.private_hex);\n\nccm.key_a2b = ccm.public;\n\nnode.warn(ccm);\n\nflow.set('ccm', ccm);\n\n\nreturn msg;",
+        "outputs": "2",
+        "noerr": 0,
+        "x": 290,
+        "y": 40,
+        "wires": [
+            [
+                "ea3345b.9ff8eb8"
+            ],
+            [
+                "3656ebb6.91acd4"
+            ]
+        ]
+    },
+    {
+        "id": "228ccc1e.dcc844",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_devs_get",
+        "func": "var ccm = flow.get('ccm');\nvar require = global.get('require');\n\n\n//http://192.168.1.173/ccm/ccm_devs_get.js?\n//hfrom_handle=512423&\n//hqid=100234391535&\n//dsess=1&\n//dsess_nid=MPjCTPq3yHucC9MMmuumbnxCJjNhGg&\n//dstart=0&\n//dcounts=128\n\nvar type = 2;\nvar newnid = ccm.makenid(++ccm.nid_seq, type ? ccm.lid:0, ccm.login_secret_dec, type, null, null);\nvar data =  {\n        lid: ccm.lid,\n        sess: 1,\n        sess_nid: newnid,\n        start:0,\n        counts:128\n    };\n    \nccm.send_msg(\n    \"ccm_devs_get.js\", \n    data\n);\n\n\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 640,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b4cbc5b7.105a18",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 460,
+        "y": 460,
+        "wires": [
+            [
+                "228ccc1e.dcc844"
+            ]
+        ]
+    },
+    {
+        "id": "f19c47be.9b51f8",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_net_get",
+        "func": "\n\nvar ccm = flow.get('ccm');\nvar require = global.get('require');\n\n\n/*http://192.168.1.173/ccm/ccm_net_get.js?\nhfrom_handle=554656&\ndsess=1&\ndsess_nid=MAa7mzBX3yvOuz7kkIOFUhFBEmEd&\ndsess_sn=1jfiegbqdqhxq&\ndtokens__x_countz_=2&\ndtokens=eth0&\ndtokens_1=ra0&\nditems__x_countz_=2&\nditems=all&\nditems_1=all&\ndforce_scan=1\n*/\n\nvar type = 2;\nvar newnid = ccm.makenid(++ccm.nid_seq, type ? ccm.lid:0, ccm.login_secret_dec, type, null, null);\nvar data =  {\n        sess: 1,\n        sess_nid: newnid,\n        sess_sn: ccm.sn,\n        tokens:[\n            \"eth0\",\n            \"ra0\"\n        ],\n        items:[\n            \"all\",\n            \"all\"\n        ],\n        force_scan:1\n    };\n    \nccm.send_msg(\n    \"ccm_net_get.js\", \n    data\n);\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 630,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "617f4e38.695da",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 460,
+        "y": 500,
+        "wires": [
+            [
+                "f19c47be.9b51f8"
+            ]
+        ]
+    },
+    {
+        "id": "8a2ef049.b12bf",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_play",
+        "func": "var ccm = flow.get('ccm');\n\nccm.ccm_play(msg.payload);\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 620,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4e97044a.ea2b9c",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 460,
+        "y": 360,
+        "wires": [
+            [
+                "8a2ef049.b12bf"
+            ]
+        ]
+    },
+    {
+        "id": "2db162e6.d96aae",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_play-rtsp",
+        "func": "var ccm = flow.get('ccm');\n\nccm.ccm_play( 'p0', 'rtsp' );\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 640,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9639cf8c.e4a6",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 460,
+        "y": 420,
+        "wires": [
+            [
+                "2db162e6.d96aae"
+            ]
+        ]
+    },
+    {
+        "id": "89826641.684698",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_profiles_get",
+        "func": "\n\nvar ccm = flow.get('ccm');\nvar require = global.get('require');\n\n\n\nvar type = 2;\nvar newnid = ccm.makenid(++ccm.nid_seq, type ? ccm.lid:0, ccm.login_secret_dec, type, null, null);\nvar data =  {\n        sess: 1,\n        sess_nid: newnid,\n        sess_sn: ccm.sn\n    };\n    \nccm.send_msg(\n    \"ccm_profiles_get.js\", \n    data\n);\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 650,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f40435fe.450c68",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 470,
+        "y": 260,
+        "wires": [
+            [
+                "89826641.684698"
+            ]
+        ]
+    },
+    {
+        "id": "6dcf7a2d.fb9034",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_snapshot",
+        "func": "\n\nvar ccm = flow.get('ccm');\nvar require = global.get('require');\n\n\n\nvar type = 2;\nvar newnid = ccm.makenid(++ccm.nid_seq, type ? ccm.lid:0, ccm.login_secret_dec, type, null, null);\nvar data =  {\n        sess: 1,\n        sess_nid: newnid,\n        sess_sn: ccm.sn,\n        token:'p0'\n    };\n    \nccm.send_msg(\n    \"ccm_snapshot.js\", \n    data\n);\n\n\nreturn msg;\n\n// http://192.168.1.173/ccm/ccm_pic_get.jpg?\n//hfrom_handle=887330&\n//dsess=1&dsess_nid=MMk1t9qL_JVpii.qAhP7pSxCAqZhAg&\n//dsess_sn=1jfiegbqdqhxq&\n//dtoken=p0_xxxxxxxxxx\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 640,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f93e4712.a98a38",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 470,
+        "y": 300,
+        "wires": [
+            [
+                "6dcf7a2d.fb9034"
+            ]
+        ]
+    },
+    {
+        "id": "82fd6a3b.662438",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_pic_get.jpg",
+        "func": "\n\nvar ccm = flow.get('ccm');\nvar require = global.get('require');\n\n\nvar profile = 'p1';\n\nvar type = 2;\nvar newnid = ccm.makenid(++ccm.nid_seq, type ? ccm.lid:0, ccm.login_secret_dec, type, null, null);\nvar data =  {\n        sess: 1,\n        sess_nid: newnid,\n        sess_sn: ccm.sn,\n        token:profile+'_xxxxxxxxxx'\n    };\n    \nccm.send_msg(\n    \"ccm_pic_get.jpg\", \n    data\n);\n\n\nreturn msg;\n\n// http://192.168.1.173/ccm/ccm_pic_get.jpg?\n//hfrom_handle=887330&\n//dsess=1&dsess_nid=MMk1t9qL_JVpii.qAhP7pSxCAqZhAg&\n//dsess_sn=1jfiegbqdqhxq&\n//dtoken=p0_xxxxxxxxxx\n\n//mine:\n//http://192.168.1.173/ccm/ccm_pic_get.jpg.js?hfrom_handle=767744&hqid=1425751368&dsess=1&dsess_nid=MOG2YBGwdpUI3BdoCmiKEThBB2EBgQI&dsess_sn=1jfiegbqdqhxq&dtoken=p0_xxxxxxxxxx\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 660,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "631b1855.3901b8",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 460,
+        "y": 200,
+        "wires": [
+            [
+                "82fd6a3b.662438"
+            ]
+        ]
+    },
+    {
+        "id": "31b330da.47c98",
+        "type": "ui_template",
+        "z": "afcdbffc.f49d3",
+        "group": "885e2c54.00ba2",
+        "name": "",
+        "order": 15,
+        "width": "6",
+        "height": "4",
+        "format": "<div>\n    <img width=\"100%\" ng-src=\"{{ msg.imageurl }}\" />\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 1000,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "30624a3d.d8bbe6",
+        "type": "http in",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "url": "/latestimage2",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 650,
+        "y": 200,
+        "wires": [
+            [
+                "b9146780.827b58"
+            ]
+        ]
+    },
+    {
+        "id": "28a58c6f.01e2d4",
+        "type": "http response",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "statusCode": "",
+        "headers": {
+            "content-type": "image/jpg"
+        },
+        "x": 990,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "b9146780.827b58",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "store lastimage",
+        "func": "if (msg.cmd === 'store'){\n    context.payload = msg.payload;\n    //node.warn(\"store image:\"+context.payload);\n    return;\n} else {\n    //node.warn(\"return stored image:\"+context.payload);\n    msg.payload = context.payload || new Buffer(0);\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 840,
+        "y": 200,
+        "wires": [
+            [
+                "28a58c6f.01e2d4"
+            ]
+        ]
+    },
+    {
+        "id": "e3c04c62.23bd9",
+        "type": "delay",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "0.01",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 830,
+        "y": 160,
+        "wires": [
+            [
+                "31b330da.47c98"
+            ]
+        ]
+    },
+    {
+        "id": "b8d8f355.064c",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_curise_get",
+        "func": "\n\nvar ccm = flow.get('ccm');\nvar require = global.get('require');\n\n\n\nvar type = 2;\nvar newnid = ccm.makenid(++ccm.nid_seq, type ? ccm.lid:0, ccm.login_secret_dec, type, null, null);\nvar data =  {\n        sess: 1,\n        sess_nid: newnid,\n        sess_sn: ccm.sn\n    };\n    \nccm.send_msg(\n    \"ccm_curise_get.js\", \n    data\n);\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 300,
+        "y": 660,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "261dc29f.e9efbe",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 130,
+        "y": 660,
+        "wires": [
+            [
+                "b8d8f355.064c"
+            ]
+        ]
+    },
+    {
+        "id": "74bdda0f.e18054",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_curise_set",
+        "func": "\n\nvar ccm = flow.get('ccm');\nvar require = global.get('require');\n\n\n\nvar type = 2;\nvar newnid = ccm.makenid(++ccm.nid_seq, type ? ccm.lid:0, ccm.login_secret_dec, type, null, null);\nvar data =  {\n        sess: 1,\n        sess_nid: newnid,\n        sess_sn: ccm.sn,\n        type:'disable',\n        index:0\n    };\n    \nccm.send_msg(\n    \"ccm_curise_set.js\", \n    data\n);\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 300,
+        "y": 720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "94536d82.29576",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 130,
+        "y": 720,
+        "wires": [
+            [
+                "74bdda0f.e18054"
+            ]
+        ]
+    },
+    {
+        "id": "3a3995b7.8d019a",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_motion_mask_get",
+        "func": "\n\nvar ccm = flow.get('ccm');\nvar require = global.get('require');\n\n\n\nvar type = 2;\nvar newnid = ccm.makenid(++ccm.nid_seq, type ? ccm.lid:0, ccm.login_secret_dec, type, null, null);\nvar data =  {\n        sess: 1,\n        sess_nid: newnid,\n        sess_sn: ccm.sn,\n    };\n    \nccm.send_msg(\n    \"ccm_motion_mask_get.js\", \n    data\n);\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 330,
+        "y": 760,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9aec732.88aa19",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 130,
+        "y": 760,
+        "wires": [
+            [
+                "3a3995b7.8d019a"
+            ]
+        ]
+    },
+    {
+        "id": "4e1f8d01.c79ea4",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_file_rw",
+        "func": "\n\nvar ccm = flow.get('ccm');\nvar require = global.get('require');\n\n\n\nvar type = 2;\nvar newnid = ccm.makenid(++ccm.nid_seq, type ? ccm.lid:0, ccm.login_secret_dec, type, null, null);\nvar data =  {\n        sess: 1,\n        sess_nid: newnid,\n        sess_sn: ccm.sn,\n        rw:0,\n        path:'/mnt/mtd/ipc_data/ptz.xml'\n    };\n    \nccm.send_msg(\n    \"ccm_file_rw.js\", \n    data\n);\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 290,
+        "y": 800,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f405e463.6e4718",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 130,
+        "y": 800,
+        "wires": [
+            [
+                "4e1f8d01.c79ea4"
+            ]
+        ]
+    },
+    {
+        "id": "110d8eec.33ab61",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_cmd",
+        "func": "\n\nvar ccm = flow.get('ccm');\nvar require = global.get('require');\n\n\n\nvar type = 2;\nvar newnid = ccm.makenid(++ccm.nid_seq, type ? ccm.lid:0, ccm.login_secret_dec, type, null, null);\nvar data =  {\n        sess: 1,\n        sess_nid: newnid,\n        sess_sn: ccm.sn,\n        cmd:'ls',\n        args:'-l'\n    };\n    \nccm.send_msg(\n    \"ccm_cmd.js\", \n    data\n);\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 280,
+        "y": 840,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a4f1e02f.3373a",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 130,
+        "y": 840,
+        "wires": [
+            [
+                "110d8eec.33ab61"
+            ]
+        ]
+    },
+    {
+        "id": "808dadd.189275",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_cap_get",
+        "func": "\n\nvar ccm = flow.get('ccm');\nvar require = global.get('require');\n\n\n\nvar type = 2;\nvar newnid = ccm.makenid(++ccm.nid_seq, type ? ccm.lid:0, ccm.login_secret_dec, type, null, null);\nvar data =  {\n        sess: 1,\n        sess_nid: newnid,\n        sess_sn: ccm.sn,\n        filtercmd:''\n    };\n    \nccm.send_msg(\n    \"ccm_cap_get.js\", \n    data\n);\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 290,
+        "y": 880,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b1d51ca3.d2ded",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 130,
+        "y": 880,
+        "wires": [
+            [
+                "808dadd.189275"
+            ]
+        ]
+    },
+    {
+        "id": "88e16841.a54bb8",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_auth",
+        "func": "\n\nvar ccm = flow.get('ccm');\nvar require = global.get('require');\n\n\n\nvar type = 2;\nvar newnid = ccm.makenid(++ccm.nid_seq, type ? ccm.lid:0, ccm.login_secret_dec, type, null, null);\nvar data =  {\n        sess: 1,\n        sess_nid: newnid,\n        sess_sn: ccm.sn,\n        action:'GetDevices'\n    };\n    \nccm.send_msg(\n    \"ccm_auth.js\", \n    data\n);\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 280,
+        "y": 920,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "73ba84a9.bbe5ec",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 130,
+        "y": 920,
+        "wires": [
+            [
+                "88e16841.a54bb8"
+            ]
+        ]
+    },
+    {
+        "id": "bbb60c.722209f8",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_dev_info_get",
+        "func": "\n\nvar ccm = flow.get('ccm');\nvar require = global.get('require');\n\n\n\nvar type = 2;\nvar newnid = ccm.makenid(++ccm.nid_seq, type ? ccm.lid:0, ccm.login_secret_dec, type, null, null);\nvar data =  {\n        sess: 1,\n        sess_nid: newnid,\n        sess_sn: ccm.sn,\n        params:'all'\n    };\n    \nccm.send_msg(\n    \"ccm_dev_info_get.js\", \n    data\n);\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 310,
+        "y": 960,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "29f1c6bc.33896a",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 130,
+        "y": 960,
+        "wires": [
+            [
+                "bbb60c.722209f8"
+            ]
+        ]
+    },
+    {
+        "id": "486476ca.1c9618",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_video_srcs_get",
+        "func": "\n\nvar ccm = flow.get('ccm');\nvar require = global.get('require');\n\n\n\nvar type = 2;\nvar newnid = ccm.makenid(++ccm.nid_seq, type ? ccm.lid:0, ccm.login_secret_dec, type, null, null);\nvar data =  {\n        sess: 1,\n        sess_nid: newnid,\n        sess_sn: ccm.sn,\n    };\n    \nccm.send_msg(\n    \"ccm_video_srcs_get.js\", \n    data\n);\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 320,
+        "y": 1000,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "50349374.4a050c",
+        "type": "inject",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 130,
+        "y": 1000,
+        "wires": [
+            [
+                "486476ca.1c9618"
+            ]
+        ]
+    },
+    {
+        "id": "7c25bd19.52b534",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ccm_ptz_ctl",
+        "func": "\n\nif(msg.topic === 'increment'){\n    context.increment = msg.payload;\n}\n\n\nvar ccm = flow.get('ccm');\nvar require = global.get('require');\n\n\n//http://192.168.1.173/ccm/ccm_ptz_ctl.js?\n/*hfrom_handle=715998&\nhqid=41658339516&\ndsess=1&dsess_nid=MAMCbFgruFM0%5fq8KH2z%5fcxVCICRhAw&\ndsess_sn=1jfiegbqdqhxq&\ndtrans=1&\ndtrans_pan_tilt=1&\ndtrans_pan_tilt_x=1&\ndtrans_pan_tilt_y=0&\ndspeed=1&\ndspeed_pan_tilt=1&\ndspeed_pan_tilt_x=30&\ndspeed_pan_tilt_y=30\n*/\n\n\nvar type = 2;\nvar newnid = ccm.makenid(++ccm.nid_seq, type ? ccm.lid:0, ccm.login_secret_dec, type, null, null);\nvar data =  {\n        sess: 1,\n        sess_nid: newnid,\n        sess_sn: ccm.sn,\n        \n        // shuold deal with these as structures/arrays\n        trans: 1,\n        trans_pan_tilt: 1,\n        trans_pan_tilt_x: 0,\n        trans_pan_tilt_y: 0,\n        speed:1,\n        speed_pan_tilt:1,\n        speed_pan_tilt_x:100,\n        speed_pan_tilt_y:100\n        \n    };\n    \n\nif (msg.payload.trans_pan_tilt_x){\n    data.trans_pan_tilt_x = msg.payload.trans_pan_tilt_x;\n}\nif (msg.payload.trans_pan_tilt_y){\n    data.trans_pan_tilt_y = msg.payload.trans_pan_tilt_y;\n}\n\nif (context.increment){\n    if (data.trans_pan_tilt_y > 0){\n        data.trans_pan_tilt_y = context.increment;\n    }\n    if (data.trans_pan_tilt_y < 0){\n        data.trans_pan_tilt_y = -context.increment;\n    }\n    if (data.trans_pan_tilt_x > 0){\n        data.trans_pan_tilt_x = context.increment;\n    }\n    if (data.trans_pan_tilt_x < 0){\n        data.trans_pan_tilt_x = -context.increment;\n    }\n}\n    \nccm.send_msg(\n    \"ccm_ptz_ctl.js\", \n    data\n);\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1030,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8a305b55.98ab48",
+        "type": "ui_button",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "group": "885e2c54.00ba2",
+        "order": 11,
+        "width": "2",
+        "height": "1",
+        "passthru": false,
+        "label": "left",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "{\"trans_pan_tilt_x\":-12,\"trans_pan_tilt_y\":0}",
+        "payloadType": "json",
+        "topic": "",
+        "x": 830,
+        "y": 260,
+        "wires": [
+            [
+                "7c25bd19.52b534"
+            ]
+        ]
+    },
+    {
+        "id": "954aff11.cad1d",
+        "type": "ui_button",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "group": "885e2c54.00ba2",
+        "order": 12,
+        "width": "2",
+        "height": "1",
+        "passthru": false,
+        "label": "right",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "{\"trans_pan_tilt_x\":12,\"trans_pan_tilt_y\":0}",
+        "payloadType": "json",
+        "topic": "",
+        "x": 830,
+        "y": 300,
+        "wires": [
+            [
+                "7c25bd19.52b534"
+            ]
+        ]
+    },
+    {
+        "id": "6943393d.7a6ae8",
+        "type": "ui_button",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "group": "885e2c54.00ba2",
+        "order": 13,
+        "width": "2",
+        "height": "1",
+        "passthru": false,
+        "label": "up",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "{\"trans_pan_tilt_x\":0,\"trans_pan_tilt_y\":12}",
+        "payloadType": "json",
+        "topic": "",
+        "x": 830,
+        "y": 340,
+        "wires": [
+            [
+                "7c25bd19.52b534"
+            ]
+        ]
+    },
+    {
+        "id": "9f30354d.867098",
+        "type": "ui_button",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "group": "885e2c54.00ba2",
+        "order": 14,
+        "width": "2",
+        "height": "1",
+        "passthru": false,
+        "label": "down",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "{\"trans_pan_tilt_x\":0,\"trans_pan_tilt_y\":-12}",
+        "payloadType": "json",
+        "topic": "",
+        "x": 830,
+        "y": 380,
+        "wires": [
+            [
+                "7c25bd19.52b534"
+            ]
+        ]
+    },
+    {
+        "id": "b006cf8c.53acc",
+        "type": "ui_numeric",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "label": "increment",
+        "group": "885e2c54.00ba2",
+        "order": 10,
+        "width": "4",
+        "height": "1",
+        "passthru": true,
+        "topic": "increment",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "511",
+        "step": 1,
+        "x": 840,
+        "y": 420,
+        "wires": [
+            [
+                "7c25bd19.52b534"
+            ]
+        ]
+    },
+    {
+        "id": "88651cf.dc3b4e",
+        "type": "ui_button",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "group": "885e2c54.00ba2",
+        "order": 16,
+        "width": "2",
+        "height": "1",
+        "passthru": false,
+        "label": "getpic",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "0",
+        "payloadType": "num",
+        "topic": "",
+        "x": 470,
+        "y": 160,
+        "wires": [
+            [
+                "82fd6a3b.662438"
+            ]
+        ]
+    },
+    {
+        "id": "b5f65144.c010d",
+        "type": "ui_template",
+        "z": "afcdbffc.f49d3",
+        "group": "885e2c54.00ba2",
+        "name": "videotemplate",
+        "order": 7,
+        "width": "28",
+        "height": "17",
+        "format": "<div>\n    <video name=\"videoElement\" class=\"centeredVideo\" controls autoplay width=\"100%\">\n            Your browser is too old which doesn't support HTML5 video.\n    </video>    \n    <button onclick=\"flv_load();\"></button>\n    <p name=\"urlp\" ng-model=\"msg.videourl\">{{msg.videourl}}</p>\n    \n    \n    <script src=\"https://cdn.bootcss.com/flv.js/1.3.2/flv.min.js\"></script>\n\n\n    <script>\n        function flv_load() {\n            console.log('isSupported: ' + flvjs.isSupported());\n            var el = document.getElementsByName('urlp')[0];\n            var urlinput = el.innerText;\n\n            var element = document.getElementsByName('videoElement')[0];\n            if (typeof player !== \"undefined\") {\n                if (player != null) {\n                    player.unload();\n                    player.detachMediaElement();\n                    player.destroy();\n                    player = null;\n                }\n            }\n            player = flvjs.createPlayer({\n                type: 'flv',\n                url: urlinput//.value\n            }, {\n                    enableWorker: false,\n                    lazyLoadMaxDuration: 3 * 60,\n                    seekType: 'range',\n                });\n            player.attachMediaElement(element);\n            player.load();\n        }\n\n        function flv_start() {\n            player.play();\n        }\n\n        function flv_pause() {\n            player.pause();\n        }\n\n        function flv_destroy() {\n            player.pause();\n            player.unload();\n            player.detachMediaElement();\n            player.destroy();\n            player = null;\n        }\n\n        function flv_seekto() {\n            var input = document.getElementsByName('seekpoint')[0];\n            player.currentTime = parseFloat(input.value);\n        }\n\n        function getUrlParam(key, defaultValue) {\n            var pageUrl = window.location.search.substring(1);\n            var pairs = pageUrl.split('&');\n            for (var i = 0; i < pairs.length; i++) {\n                var keyAndValue = pairs[i].split('=');\n                if (keyAndValue[0] === key) {\n                    return keyAndValue[1];\n                }\n            }\n            return defaultValue;\n        }\n\n        //var urlInputBox = document.getElementsByName('urlinput')[0];\n        //var url = decodeURIComponent(getUrlParam('src', urlInputBox.value));\n        //urlInputBox.value = url;\n\n        //var logcatbox = document.getElementsByName('logcatbox')[0];\n        //flvjs.LoggingControl.addLogListener(function (type, str) {\n        //    console.log(str);\n            //logcatbox.value = logcatbox.value + str + '\\n';\n            //logcatbox.scrollTop = logcatbox.scrollHeight;\n        //});\n\n        //document.addEventListener('DOMContentLoaded', function () {\n        //    flv_load();\n        //});\n    </script>\n    \n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 1020,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "69a87782.11d578",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "ParsePlayAck",
+        "func": "if (msg.payload.type === 'ccm_play_ack'){\n    var v = msg.payload.data.uri.url.split('/');\n    var name = v[v.length-1];\n    var newmsg = {\n        videourl: 'ws://127.0.0.1:8000/live/'+name\n    }\n    node.send ([null, newmsg]);\n}\nreturn msg;",
+        "outputs": "2",
+        "noerr": 0,
+        "x": 740,
+        "y": 100,
+        "wires": [
+            [
+                "e65d0620.6d46f8"
+            ],
+            [
+                "b5f65144.c010d"
+            ]
+        ]
+    },
+    {
+        "id": "3291e70a.171d78",
+        "type": "ui_button",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "group": "885e2c54.00ba2",
+        "order": 8,
+        "width": "2",
+        "height": "1",
+        "passthru": false,
+        "label": "play HD",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "p0",
+        "payloadType": "str",
+        "topic": "",
+        "x": 300,
+        "y": 340,
+        "wires": [
+            [
+                "8a2ef049.b12bf"
+            ]
+        ]
+    },
+    {
+        "id": "a37bf145.8cd0e",
+        "type": "ui_button",
+        "z": "afcdbffc.f49d3",
+        "name": "",
+        "group": "885e2c54.00ba2",
+        "order": 9,
+        "width": "2",
+        "height": "1",
+        "passthru": false,
+        "label": "play SD",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "p1",
+        "payloadType": "str",
+        "topic": "",
+        "x": 300,
+        "y": 380,
+        "wires": [
+            [
+                "8a2ef049.b12bf"
+            ]
+        ]
+    },
+    {
+        "id": "440ea9a8.193d08",
+        "type": "comment",
+        "z": "afcdbffc.f49d3",
+        "name": "less useful commands:",
+        "info": "",
+        "x": 130,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "ea3345b.9ff8eb8",
+        "type": "function",
+        "z": "afcdbffc.f49d3",
+        "name": "setup",
+        "func": "var ccm = flow.get('ccm');\n\nccm.url = 'http://youcameralocalip';\nccm.from_handle = Math.floor(1E6 * Math.random());\nccm.sn = 'yourcameraserial';\nccm.user = ccm.sn;\nccm.pass = 'yourcamerapassword';\n\nccm.ccm_info_get();\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 470,
+        "y": 20,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "885e2c54.00ba2",
+        "type": "ui_group",
+        "z": "",
+        "name": "Default",
+        "tab": "55e1e9cf.f824a8",
+        "disp": true,
+        "width": "36"
+    },
+    {
+        "id": "55e1e9cf.f824a8",
+        "type": "ui_tab",
+        "z": "",
+        "name": "new",
+        "icon": "dashboard"
+    }
+]
