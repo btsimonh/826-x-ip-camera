@@ -3,11 +3,33 @@ The upgrade file was obtained as follows:
 On a router through which the IP data is flowing, run
 tcpdump  -nnvXSs 0 -i any host <ip of camera>
 on the camera (whilst offered an upgrade), request the upgrade.
-Note the file requested.
+Note the file requested, e.g.:
 
-In my case this was 
-ipc_pack_patch_from_v4.6.2.1706161621.rtl8188fu_to_v5.1.5.1803281502.rtl8188fu.bin
-(unfortunately I don't have a log of exactly where from).
+on my LEDE router, I ran
+tcpdump  -nnvXSs 0 -i any host 192.168.1.173 >/tmp/dump.txt
+(redirection avoided packets being dropped).
+And got:
+09:15:55.257454 IP (tos 0x0, ttl 64, id 63745, offset 0, flags [DF], proto TCP (6), length 421)
+    192.168.1.173.55308 > 209.133.212.170.2080: Flags [P.], cksum 0x6da1 (correct), seq 3554617430:3554617811, ack 833083278, win 3525, length 381
+        0x0000:  4500 01a5 f901 4000 4006 d7cb c0a8 01ad  E.....@.@.......
+        0x0010:  d185 d4aa d80c 0820 d3df 2856 31a7 d78e  ..........(V1...
+        0x0020:  5018 0dc5 6da1 0000 4745 5420 2f76 6572  P...m...GET./ver
+        0x0030:  7369 6f6e 2f69 7063 2f67 6d38 3133 362f  sion/ipc/gm8136/
+        0x0040:  7635 2e31 2e36 2e31 3830 3432 3531 3430  v5.1.6.180425140
+        0x0050:  322f 6970 635f 7061 636b 5f70 6174 6368  2/ipc_pack_patch
+        0x0060:  5f66 726f 6d5f 7634 2e36 2e32 2e31 3730  _from_v4.6.2.170
+        0x0070:  3631 3631 3632 312e 7274 6c38 3138 3866  6161621.rtl8188f
+        0x0080:  755f 746f 5f76 352e 312e 362e 3138 3034  u_to_v5.1.6.1804
+        0x0090:  3235 3134 3032 2e72 746c 3831 3838 6675  251402.rtl8188fu
+        0x00a0:  2e62 696e 2048 5454 502f 312e 310d 0a41  .bin.HTTP/1.1..A
+
+which is an HTTP access to
+http://209.133.212.170:2080/version/ipc/gm8136/v5.1.6.1804251402/ipc_pack_patch_from_v4.6.2.1706161621.rtl8188fu_to_v5.1.6.1804251402.rtl8188fu.bin
+
+
+
+In my first case this was 
+http://209.133.212.170:2080/version/ipc/gm8136/v5.1.5.1803281502/ipc_pack_patch_from_v4.6.2.1706161621.rtl8188fu_to_v5.1.5.1803281502.rtl8188fu.bin
 download this file using your browser.
 
 The ipc_pack format has a fairly simple layout, discovered using the hex editor HxD:
